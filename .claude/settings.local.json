@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp:*)",
+      "Bash(cd \"F:/playground/Tracion\" && mkdir -p apps/api/src/routes apps/api/src/services \"apps/api/src/db/migrations\" apps/api/src/otel apps/web/app \"apps/web/components/graph\" \"apps/web/components/trace\" \"apps/web/components/dashboard\" packages/sdk-typescript/src packages/sdk-python/src packages/mcp-server/src && echo \"Done\")",
+      "Bash(cd \"F:/playground/Tracion\" && cp \"f:/Download/CLAUDE.md\" ./CLAUDE.md && echo \"Copied\")",
+      "Bash(cd F:/playground/Tracion/apps/api && npx drizzle-kit generate 2>&1)",
+      "Bash(cat >> F:/playground/Tracion/apps/api/src/db/migrations/0000_curvy_roxanne_simpson.sql << 'EOF'\n\n-- Enable TimescaleDB and create hypertable\nCREATE EXTENSION IF NOT EXISTS timescaledb;\nSELECT create_hypertable\\('otel.traces', 'start_time', if_not_exists => TRUE\\);\nEOF)",
+      "Bash(cd F:/playground/Tracion && docker compose up db -d 2>&1)"
+    ]
+  }
+}
