@@ -9,7 +9,7 @@ type AnthropicMessagesCreate = (params: {
   [key: string]: unknown
 }) => Promise<{
   model: string
-  usage: { input_tokens: number; output_tokens: number }
+  usage: { input_tokens: number; output_tokens: number } | null | undefined
   [key: string]: unknown
 }>
 

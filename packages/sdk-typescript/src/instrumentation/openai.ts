@@ -8,7 +8,7 @@ type OpenAICompletionsCreate = (params: {
   [key: string]: unknown
 }) => Promise<{
   model: string
-  usage: { prompt_tokens: number; completion_tokens: number }
+  usage: { prompt_tokens: number; completion_tokens: number } | null | undefined
   [key: string]: unknown
 }>
 
