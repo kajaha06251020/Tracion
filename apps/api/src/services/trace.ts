@@ -125,13 +125,19 @@ export async function deleteTrace(
 export async function searchTraces(
   db: DB,
   query: string,
-  limit = 20
+  limit = 20,
+  since?: string,
+  until?: string,
 ): Promise<Result<Trace[], TraceError>> {
   try {
+    const conditions = [sql`${traces.name} ILIKE ${'%' + query + '%'}`]
+    if (since) conditions.push(sql`${traces.startTime} >= ${new Date(since)}`)
+    if (until) conditions.push(sql`${traces.startTime} <= ${new Date(until)}`)
+
     const rows = await db
       .select()
       .from(traces)
-      .where(sql`${traces.name} ILIKE ${'%' + query + '%'}`)
+      .where(and(...conditions))
       .orderBy(desc(traces.startTime))
       .limit(Math.min(limit, 100))
     return ok(rows as Trace[])

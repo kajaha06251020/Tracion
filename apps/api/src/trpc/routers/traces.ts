@@ -47,9 +47,14 @@ export const tracesRouter = router({
     }),
 
   search: publicProcedure
-    .input(z.object({ query: z.string(), limit: z.number().default(20) }))
+    .input(z.object({
+      query: z.string(),
+      limit: z.number().default(20),
+      since: z.string().datetime().optional(),
+      until: z.string().datetime().optional(),
+    }))
     .query(async ({ ctx, input }) => {
-      const result = await searchTraces(ctx.db, input.query, input.limit)
+      const result = await searchTraces(ctx.db, input.query, input.limit, input.since, input.until)
       if (!result.ok) throw traceErrorToTRPC(result.error.code)
       return result.data
     }),
