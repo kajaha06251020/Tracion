@@ -32,8 +32,10 @@ export function patchAnthropic(tracer: Tracer, client: AnthropicLike | undefined
 
       try {
         const result = await original.call(this, params)
-        span.setAttribute('llm.input_tokens', result.usage.input_tokens)
-        span.setAttribute('llm.output_tokens', result.usage.output_tokens)
+        if (result.usage) {
+          span.setAttribute('llm.input_tokens', result.usage.input_tokens)
+          span.setAttribute('llm.output_tokens', result.usage.output_tokens)
+        }
         span.setStatus({ code: SpanStatusCode.OK })
         span.end()
         return result

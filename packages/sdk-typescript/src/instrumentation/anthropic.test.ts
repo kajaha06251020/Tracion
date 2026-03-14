@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
 import { InMemorySpanExporter, SimpleSpanProcessor, BasicTracerProvider } from '@opentelemetry/sdk-trace-base'
-import { trace } from '@opentelemetry/api'
 import { patchAnthropic } from './anthropic'
 
 function setupProvider() {
@@ -9,12 +8,6 @@ function setupProvider() {
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter))
   provider.register()
   return { exporter, tracer: provider.getTracer('test') }
-}
-
-// Anthropic SDK のモック
-const mockCreate = vi.fn()
-const mockAnthropic = {
-  messages: { create: mockCreate },
 }
 
 describe('patchAnthropic', () => {
@@ -26,6 +19,11 @@ describe('patchAnthropic', () => {
 
   it('Anthropic クライアントのメソッドをパッチしてトークンを記録する', async () => {
     const { exporter, tracer } = setupProvider()
+
+    const mockCreate = vi.fn()
+    const mockAnthropic = {
+      messages: { create: mockCreate },
+    }
 
     mockCreate.mockResolvedValue({
       model: 'claude-opus-4-6',
@@ -40,8 +38,6 @@ describe('patchAnthropic', () => {
       messages: [{ role: 'user', content: 'Hi' }],
       max_tokens: 100,
     })
-
-    await new Promise((r) => setTimeout(r, 10))
 
     const spans = exporter.getFinishedSpans()
     expect(spans.length).toBeGreaterThan(0)
