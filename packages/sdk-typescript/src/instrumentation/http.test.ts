@@ -15,12 +15,13 @@ function setupProvider(): { exporter: InMemorySpanExporter; tracer: ReturnType<t
 }
 
 describe('patchFetch', () => {
-  const originalFetch = globalThis.fetch
   let exporter: InMemorySpanExporter
+  let tracer: ReturnType<typeof trace.getTracer>
 
   beforeEach(() => {
     const setup = setupProvider()
     exporter = setup.exporter
+    tracer = setup.tracer
     patchFetch(setup.tracer)
   })
 
@@ -30,6 +31,8 @@ describe('patchFetch', () => {
   })
 
   it('Anthropic API への fetch でスパンを自動生成する', async () => {
+    // Re-patch with mock as the base fetch so the interceptor can call the mock
+    unpatchFetch()
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       clone: () => ({
@@ -39,8 +42,7 @@ describe('patchFetch', () => {
         }),
       }),
     }) as unknown as typeof fetch
-
-    patchFetch(trace.getTracer('test'))
+    patchFetch(tracer)
 
     await globalThis.fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

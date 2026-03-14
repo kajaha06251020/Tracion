@@ -10,7 +10,7 @@ type LlmEndpoint = typeof LLM_ENDPOINTS[number]
 
 let originalFetch: typeof globalThis.fetch | undefined
 
-function getUrl(input: RequestInfo | URL): string {
+function getUrl(input: string | URL | Request): string {
   if (typeof input === 'string') return input
   if (input instanceof URL) return input.toString()
   return input.url
@@ -39,16 +39,16 @@ function extractTokens(
   if (!usage) return {}
 
   if (provider === 'anthropic') {
-    return {
-      inputTokens: typeof usage['input_tokens'] === 'number' ? usage['input_tokens'] : undefined,
-      outputTokens: typeof usage['output_tokens'] === 'number' ? usage['output_tokens'] : undefined,
-    }
+    const result: { inputTokens?: number; outputTokens?: number } = {}
+    if (typeof usage['input_tokens'] === 'number') result.inputTokens = usage['input_tokens']
+    if (typeof usage['output_tokens'] === 'number') result.outputTokens = usage['output_tokens']
+    return result
   }
   if (provider === 'openai') {
-    return {
-      inputTokens: typeof usage['prompt_tokens'] === 'number' ? usage['prompt_tokens'] : undefined,
-      outputTokens: typeof usage['completion_tokens'] === 'number' ? usage['completion_tokens'] : undefined,
-    }
+    const result: { inputTokens?: number; outputTokens?: number } = {}
+    if (typeof usage['prompt_tokens'] === 'number') result.inputTokens = usage['prompt_tokens']
+    if (typeof usage['completion_tokens'] === 'number') result.outputTokens = usage['completion_tokens']
+    return result
   }
   return {}
 }
@@ -61,7 +61,7 @@ export function patchFetch(tracer: Tracer): void {
   const original = originalFetch
 
   globalThis.fetch = async function patchedFetch(
-    input: RequestInfo | URL,
+    input: string | URL | Request,
     init?: RequestInit
   ): Promise<Response> {
     const url = getUrl(input)
