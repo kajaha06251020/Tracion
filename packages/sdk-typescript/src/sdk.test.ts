@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base'
+import { InMemorySpanExporter } from '@opentelemetry/sdk-trace-base'
 import { TraceforgeSDK } from './sdk'
 
 function createTestSdk(overrides: { enabled?: boolean } = {}) {
