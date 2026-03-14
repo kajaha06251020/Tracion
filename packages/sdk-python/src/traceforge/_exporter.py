@@ -36,9 +36,9 @@ class OtlpJsonExporter(SpanExporter):
 
     def _to_otlp_json(self, spans: Sequence[ReadableSpan]) -> dict[str, Any]:
         # Resource ごとにグルーピング
-        resource_map: dict[int, dict] = {}
+        resource_map: dict[tuple, dict] = {}
         for span in spans:
-            key = id(span.resource)
+            key = tuple(sorted(span.resource.attributes.items())) if span.resource.attributes else ()
             if key not in resource_map:
                 resource_map[key] = {
                     "resource": {
