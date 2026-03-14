@@ -22,6 +22,7 @@ export const tracesRouter = router({
         agentId: z.string().optional(),
         status: z.enum(['running', 'success', 'error']).optional(),
         search: z.string().optional(),
+        since: z.string().datetime().optional(),
       })
     )
     .query(async ({ ctx, input }) => {

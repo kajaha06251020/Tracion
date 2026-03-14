@@ -10,6 +10,7 @@ type ListTracesInput = {
   agentId?: string | undefined
   status?: 'running' | 'success' | 'error' | undefined
   search?: string | undefined
+  since?: string | undefined
 }
 
 type Cursor = { startTime: string; id: string }
@@ -85,6 +86,9 @@ export async function listTraces(
     if (input.status) conditions.push(eq(traces.status, input.status))
     if (input.search) {
       conditions.push(sql`${traces.name} ILIKE ${'%' + input.search + '%'}`)
+    }
+    if (input.since) {
+      conditions.push(sql`${traces.startTime} >= ${new Date(input.since)}`)
     }
 
     const rows = await db
