@@ -35,6 +35,5 @@ CREATE TABLE "otel"."traces" (
 );
 --> statement-breakpoint
 ALTER TABLE "otel"."spans" ADD CONSTRAINT "spans_trace_id_traces_id_fk" FOREIGN KEY ("trace_id") REFERENCES "otel"."traces"("id") ON DELETE cascade ON UPDATE no action;
--- Enable TimescaleDB and create hypertable
+-- Enable TimescaleDB (hypertable creation deferred to Phase 2 when PK becomes composite)
 CREATE EXTENSION IF NOT EXISTS timescaledb;
-SELECT create_hypertable('otel.traces', 'start_time', if_not_exists => TRUE);
