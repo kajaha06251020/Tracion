@@ -1,0 +1,12 @@
+opentelemetry-api>=1.26.0
+opentelemetry-sdk>=1.26.0
+
+[anthropic]
+anthropic>=0.24.0
+
+[dev]
+pytest>=8.0.0
+pytest-mock>=3.12.0
+
+[openai]
+openai>=1.0.0

@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: traceforge
+Version: 0.1.0
+Requires-Python: >=3.11
+Requires-Dist: opentelemetry-api>=1.26.0
+Requires-Dist: opentelemetry-sdk>=1.26.0
+Provides-Extra: anthropic
+Requires-Dist: anthropic>=0.24.0; extra == "anthropic"
+Provides-Extra: openai
+Requires-Dist: openai>=1.0.0; extra == "openai"
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.12.0; extra == "dev"
