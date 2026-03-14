@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { router, publicProcedure } from '../router'
+import { router, publicProcedure } from '../init'
 import {
   getTrace,
   listTraces,

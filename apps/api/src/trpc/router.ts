@@ -1,12 +1,8 @@
-import { initTRPC } from '@trpc/server'
-import type { Context } from './context'
+import { router } from './init'
 import { tracesRouter } from './routers/traces'
 import { spansRouter } from './routers/spans'
 
-const t = initTRPC.context<Context>().create()
-
-export const router = t.router
-export const publicProcedure = t.procedure
+export { router, publicProcedure } from './init'
 
 export const appRouter = router({
   traces: tracesRouter,

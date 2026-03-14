@@ -10,7 +10,6 @@ RUN bun install
 
 FROM base AS runner
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY . .
 
 WORKDIR /app/apps/api
