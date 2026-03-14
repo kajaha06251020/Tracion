@@ -80,8 +80,7 @@ describe('getTrace', () => {
 
     const result = await getTrace(mockDb, 'nonexistent')
     expect(result.ok).toBe(false)
-    if (!result.ok) {
-      expect(result.error.code).toBe('NOT_FOUND')
+    if (!result.ok && result.error.code === 'NOT_FOUND') {
       expect(result.error.traceId).toBe('nonexistent')
     }
   })

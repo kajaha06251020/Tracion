@@ -3,15 +3,15 @@ import type { NewTrace, NewSpan } from '../db/schema'
 import type { TraceStatus, SpanKind } from '../types'
 
 // OTLP/HTTP JSON types (subset we care about)
-type OtlpAttributeValue =
+export type OtlpAttributeValue =
   | { stringValue: string }
   | { intValue: string }
   | { doubleValue: number }
   | { boolValue: boolean }
 
-type OtlpAttribute = { key: string; value: OtlpAttributeValue }
+export type OtlpAttribute = { key: string; value: OtlpAttributeValue }
 
-type OtlpSpan = {
+export type OtlpSpan = {
   traceId: string
   spanId: string
   parentSpanId?: string
@@ -23,7 +23,7 @@ type OtlpSpan = {
   events?: unknown[]
 }
 
-type OtlpPayload = {
+export type OtlpPayload = {
   resourceSpans: Array<{
     resource?: { attributes?: OtlpAttribute[] }
     scopeSpans: Array<{ spans: OtlpSpan[] }>

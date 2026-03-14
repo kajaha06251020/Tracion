@@ -5,11 +5,11 @@ import type { NewTrace } from '../db/schema'
 import { ok, err, type Result, type TraceError, type Trace, type Span } from '../types'
 
 type ListTracesInput = {
-  cursor?: string
-  limit?: number
-  agentId?: string
-  status?: 'running' | 'success' | 'error'
-  search?: string
+  cursor?: string | undefined
+  limit?: number | undefined
+  agentId?: string | undefined
+  status?: 'running' | 'success' | 'error' | undefined
+  search?: string | undefined
 }
 
 type Cursor = { startTime: string; id: string }
