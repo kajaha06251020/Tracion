@@ -39,8 +39,8 @@ class TestOtelTraceforgeSpan:
         # Check set_status was called once
         assert otel.set_status.call_count == 1
         call_args = otel.set_status.call_args[0][0]
-        assert call_args._status_code == StatusCode.OK
-        assert call_args._description is None
+        assert call_args.status_code == StatusCode.OK
+        assert call_args.description is None
 
         otel.end.assert_called_once()
 
@@ -52,8 +52,8 @@ class TestOtelTraceforgeSpan:
         # Check set_status was called once
         assert otel.set_status.call_count == 1
         call_args = otel.set_status.call_args[0][0]
-        assert call_args._status_code == StatusCode.ERROR
-        assert call_args._description == "boom"
+        assert call_args.status_code == StatusCode.ERROR
+        assert call_args.description == "boom"
 
         otel.end.assert_called_once()
 

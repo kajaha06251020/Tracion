@@ -1,8 +1,9 @@
 import json
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, cast
 
 from opentelemetry.trace import Span as OtelSpan, StatusCode, Status
+from opentelemetry.util.types import Attributes
 
 from traceforge._types import TraceStatus
 
@@ -41,7 +42,7 @@ class OtelTraceforgeSpan(TraceforgeSpan):
             self._otel_span.set_attribute(key, json.dumps(value))
 
     def add_event(self, name: str, attributes: dict[str, Any] | None = None) -> None:
-        self._otel_span.add_event(name, attributes or {})
+        self._otel_span.add_event(name, cast(Attributes, attributes) if attributes else None)
 
     def end(self, status: TraceStatus = "success", error: BaseException | None = None) -> None:
         if status == "error":
