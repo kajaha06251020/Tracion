@@ -5,5 +5,5 @@ type AuthUser = typeof auth.$Infer.Session.user
 
 export type Context = {
   db: DB
-  user: AuthUser
+  user: AuthUser | null
 }
