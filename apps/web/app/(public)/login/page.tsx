@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { signIn } from '@/lib/auth'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
