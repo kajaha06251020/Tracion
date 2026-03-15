@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState } from 'react'
+import { use, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { trpc } from '@/lib/trpc'
 import { SpanWaterfall } from '@/components/trace/span-waterfall'
@@ -16,6 +16,10 @@ const STATUS_COLORS: Record<string, string> = {
 export default function TraceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [selectedSpanId, setSelectedSpanId] = useState<string | null>(null)
+  const [shareToken, setShareToken] = useState<string | null>(null)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null)
 
   const { data: trace, isLoading: traceLoading } = trpc.traces.get.useQuery(id, {
     refetchInterval: (query) => query.state.data?.status === 'running' ? 2000 : false,
@@ -25,6 +29,44 @@ export default function TraceDetailPage({ params }: { params: Promise<{ id: stri
   })
 
   const selectedSpan = spans.find((s) => s.id === selectedSpanId)
+
+  useEffect(() => {
+    if (trace?.shareToken !== undefined) {
+      setShareToken(trace.shareToken ?? null)
+    }
+  }, [trace?.shareToken])
+
+  function copyToClipboard(url: string) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url)
+        .then(() => {
+          setCopied(true)
+          setFallbackUrl(null)
+          setTimeout(() => setCopied(false), 2000)
+        })
+        .catch(() => {
+          setFallbackUrl(url)
+        })
+    } else {
+      setFallbackUrl(url)
+    }
+  }
+
+  const createShare = trpc.traces.createShareLink.useMutation({
+    onSuccess: ({ token, shareUrl: url }) => {
+      setShareToken(token)
+      setShareUrl(url)
+      copyToClipboard(url)
+    },
+  })
+
+  const revokeShare = trpc.traces.revokeShareLink.useMutation({
+    onSuccess: () => {
+      setShareToken(null)
+      setShareUrl(null)
+      setFallbackUrl(null)
+    },
+  })
 
   if (traceLoading || spansLoading) {
     return <div className="p-8 text-center text-gray-500">Loading...</div>
@@ -44,12 +86,62 @@ export default function TraceDetailPage({ params }: { params: Promise<{ id: stri
           </Link>
           <div className="flex items-start justify-between">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{trace.name}</h1>
-            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[trace.status]}`}>
-              {trace.status === 'running' && (
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[trace.status]}`}>
+                  {trace.status === 'running' && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  )}
+                  {trace.status}
+                </span>
+                {!shareToken ? (
+                  <button
+                    onClick={() => createShare.mutate({ traceId: id })}
+                    disabled={createShare.isPending}
+                    className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {createShare.isPending ? 'Sharing...' : 'Share'}
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        const url = shareUrl ?? `${process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000'}/share/${shareToken}`
+                        copyToClipboard(url)
+                      }}
+                      className="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                    >
+                      {copied ? 'Copied!' : 'Copy link'}
+                    </button>
+                    <button
+                      onClick={() => revokeShare.mutate({ traceId: id })}
+                      disabled={revokeShare.isPending}
+                      className="text-xs px-3 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded disabled:opacity-50"
+                    >
+                      Revoke
+                    </button>
+                  </div>
+                )}
+              </div>
+              {fallbackUrl && (
+                <div className="flex items-center gap-1 mt-1">
+                  <input
+                    type="text"
+                    readOnly
+                    value={fallbackUrl}
+                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded w-64 select-all"
+                    onFocus={(e) => e.target.select()}
+                  />
+                  <button
+                    onClick={() => setFallbackUrl(null)}
+                    className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                    aria-label="Dismiss"
+                  >
+                    x
+                  </button>
+                </div>
               )}
-              {trace.status}
-            </span>
+            </div>
           </div>
           <div className="flex gap-4 mt-2 text-sm text-gray-500">
             <span>{formatDuration(trace.startTime, trace.endTime)}</span>
