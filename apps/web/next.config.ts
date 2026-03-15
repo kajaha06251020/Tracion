@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   // Proxy /api/* requests to the Hono API server
   async rewrites() {
     return [
