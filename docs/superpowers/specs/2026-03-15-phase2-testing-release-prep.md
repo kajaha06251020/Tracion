@@ -80,7 +80,7 @@ Note: Full OAuth mock flow (complete login cycle) is out of scope for Phase 2 E2
 Before setting up CI, perform these one-time steps:
 
 1. **Remove `"private": true`** from `packages/sdk-typescript/package.json` and `packages/mcp-server/package.json`
-2. **Rename Python package**: Update `packages/sdk-python/pyproject.toml` — change `name = "traceforge"` to `name = "tracion"`
+2. **Rename Python package**: Update `packages/sdk-python/pyproject.toml` — change `name = "tracion"` to `name = "tracion"`
 3. **Initialize changesets**: Run `bun add -d @changesets/cli -w && bun changeset init` and commit `.changeset/config.json`
 4. **Add twine**: Add `twine` and `build` as Python dev dependencies in `packages/sdk-python/pyproject.toml`
 

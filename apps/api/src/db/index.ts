@@ -3,7 +3,7 @@ import { Pool } from 'pg'
 import * as schema from './schema'
 
 const pool = new Pool({
-  connectionString: process.env.TRACEFORGE_DATABASE_URL,
+  connectionString: process.env.TRACION_DATABASE_URL,
 })
 
 export const db = drizzle(pool, { schema })

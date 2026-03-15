@@ -25,7 +25,7 @@ export function patchOpenAI(tracer: Tracer, client: OpenAILike | undefined): voi
       params: Parameters<OpenAICompletionsCreate>[0]
     ): Promise<Awaited<ReturnType<OpenAICompletionsCreate>>> {
       const span = tracer.startSpan('openai.chat.completions.create')
-      span.setAttribute('traceforge.kind', 'llm')
+      span.setAttribute('tracion.kind', 'llm')
       span.setAttribute('llm.provider', 'openai')
       span.setAttribute('llm.model', params.model)
 

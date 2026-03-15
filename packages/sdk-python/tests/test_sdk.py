@@ -2,12 +2,12 @@ import pytest
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import StatusCode
 
-from traceforge._sdk import TraceforgeSDK
+from tracion._sdk import TracionSDK
 
 
 def make_sdk(**kwargs):
     exporter = InMemorySpanExporter()
-    sdk = TraceforgeSDK(
+    sdk = TracionSDK(
         endpoint="http://localhost:3001",
         agent_id="test-agent",
         session_id="test-session",
@@ -17,7 +17,7 @@ def make_sdk(**kwargs):
     return sdk, exporter
 
 
-class TestTraceforgeSDK:
+class TestTracionSDK:
     def test_trace_context_manager_records_span(self):
         sdk, exporter = make_sdk()
         with sdk.trace("generate_code") as span:
@@ -27,8 +27,8 @@ class TestTraceforgeSDK:
         spans = exporter.get_finished_spans()
         assert len(spans) == 1
         assert spans[0].name == "generate_code"
-        assert spans[0].attributes["traceforge.input"] == '"hello"'
-        assert spans[0].attributes["traceforge.output"] == '"world"'
+        assert spans[0].attributes["tracion.input"] == '"hello"'
+        assert spans[0].attributes["tracion.output"] == '"world"'
 
     def test_trace_sets_error_status_on_exception(self):
         sdk, exporter = make_sdk()
@@ -46,7 +46,7 @@ class TestTraceforgeSDK:
             pass
 
         spans = exporter.get_finished_spans()
-        assert spans[0].attributes["traceforge.kind"] == "llm"
+        assert spans[0].attributes["tracion.kind"] == "llm"
 
     def test_start_span_manual_style(self):
         sdk, exporter = make_sdk()
@@ -56,7 +56,7 @@ class TestTraceforgeSDK:
         spans = exporter.get_finished_spans()
         assert len(spans) == 1
         assert spans[0].name == "tool_call"
-        assert spans[0].attributes["traceforge.kind"] == "tool"
+        assert spans[0].attributes["tracion.kind"] == "tool"
 
     def test_disabled_sdk_trace_still_executes_body(self):
         sdk, _ = make_sdk(enabled=False)

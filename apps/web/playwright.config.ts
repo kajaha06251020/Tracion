@@ -27,13 +27,13 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'TRACEFORGE_TEST_MODE=true bun run dev',
+      command: 'TRACION_TEST_MODE=true bun run dev',
       url: 'http://localhost:3000',
       reuseExistingServer: !process.env.CI,
-      env: { TRACEFORGE_TEST_MODE: 'true' },
+      env: { TRACION_TEST_MODE: 'true' },
     },
     {
-      command: 'TRACEFORGE_TEST_MODE=true bun run start',
+      command: 'TRACION_TEST_MODE=true bun run start',
       url: 'http://localhost:3001/health',
       reuseExistingServer: !process.env.CI,
       cwd: '../api',

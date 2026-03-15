@@ -5,7 +5,7 @@ export default {
   out: './src/db/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.TRACEFORGE_DATABASE_URL ?? '',
+    url: process.env.TRACION_DATABASE_URL ?? '',
   },
   schemaFilter: ['otel'],
 } satisfies Config

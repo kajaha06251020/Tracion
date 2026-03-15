@@ -1,5 +1,5 @@
 {
-  "name": "@traceforge/web",
+  "name": "@tracion/web",
   "private": true,
   "version": "0.1.0",
   "scripts": {
@@ -33,7 +33,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@traceforge/api": "*",
+    "@tracion/api": "*",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",

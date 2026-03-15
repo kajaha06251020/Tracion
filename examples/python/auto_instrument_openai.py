@@ -2,20 +2,20 @@
 Python SDK — OpenAI auto-instrumentation example
 
 Usage:
-    pip install traceforge openai
+    pip install tracion openai
     OPENAI_API_KEY=sk-... python auto_instrument_openai.py
 """
 
 import os
 import time
 import openai
-from traceforge import TraceforgeSDK
-from traceforge.instrumentation import patch_openai
+from tracion import TracionSDK
+from tracion.instrumentation import patch_openai
 
 client = openai.OpenAI()
 
-sdk = TraceforgeSDK(
-    endpoint=os.environ.get("TRACEFORGE_API_URL", "http://localhost:3001"),
+sdk = TracionSDK(
+    endpoint=os.environ.get("TRACION_API_URL", "http://localhost:3001"),
     agent_id="openai-example",
 )
 

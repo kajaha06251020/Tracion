@@ -2,7 +2,7 @@ import { SpanStatusCode } from '@opentelemetry/api'
 import type { Span as OtelSpan } from '@opentelemetry/api'
 import type { SpanEndOptions } from './types'
 
-export interface TraceforgeSpan {
+export interface TracionSpan {
   setInput(value: unknown): void
   setOutput(value: unknown): void
   setAttribute(key: string, value: unknown): void
@@ -10,15 +10,15 @@ export interface TraceforgeSpan {
   end(options?: SpanEndOptions): void
 }
 
-export class OtelTraceforgeSpan implements TraceforgeSpan {
+export class OtelTracionSpan implements TracionSpan {
   constructor(private readonly otelSpan: OtelSpan) {}
 
   setInput(value: unknown): void {
-    this.otelSpan.setAttribute('traceforge.input', JSON.stringify(value))
+    this.otelSpan.setAttribute('tracion.input', JSON.stringify(value))
   }
 
   setOutput(value: unknown): void {
-    this.otelSpan.setAttribute('traceforge.output', JSON.stringify(value))
+    this.otelSpan.setAttribute('tracion.output', JSON.stringify(value))
   }
 
   setAttribute(key: string, value: unknown): void {
@@ -42,7 +42,7 @@ export class OtelTraceforgeSpan implements TraceforgeSpan {
   }
 }
 
-export class NoopTraceforgeSpan implements TraceforgeSpan {
+export class NoopTracionSpan implements TracionSpan {
   setInput(_value: unknown): void { /* no-op */ }
   setOutput(_value: unknown): void { /* no-op */ }
   setAttribute(_key: string, _value: unknown): void { /* no-op */ }

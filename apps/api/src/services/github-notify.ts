@@ -43,7 +43,7 @@ export function buildCommentBody(trace: Trace): string {
     : '—'
 
   const costStr = `$${parseFloat(trace.totalCostUsd as string).toFixed(4)}`
-  const traceUrl = `${process.env.TRACEFORGE_WEB_URL ?? 'http://localhost:3000'}/traces/${trace.id}`
+  const traceUrl = `${process.env.TRACION_WEB_URL ?? 'http://localhost:3000'}/traces/${trace.id}`
 
   return [
     '## 🤖 Tracion — Agent Trace',

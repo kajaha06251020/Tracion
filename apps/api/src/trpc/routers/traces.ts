@@ -127,7 +127,7 @@ export const tracesRouter = router({
         .set({ shareToken: token })
         .where(eq(traces.id, input.traceId))
 
-      const webUrl = process.env.TRACEFORGE_WEB_URL ?? 'http://localhost:3000'
+      const webUrl = process.env.TRACION_WEB_URL ?? 'http://localhost:3000'
       return { token, shareUrl: `${webUrl}/share/${token}` }
     }),
 

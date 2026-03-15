@@ -3,7 +3,7 @@ import { Pool } from 'pg'
 import { drizzle } from 'drizzle-orm/node-postgres'
 
 const pool = new Pool({
-  connectionString: process.env.TRACEFORGE_DATABASE_URL,
+  connectionString: process.env.TRACION_DATABASE_URL,
 })
 
 const db = drizzle(pool)

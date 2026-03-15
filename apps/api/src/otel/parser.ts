@@ -77,10 +77,10 @@ export function parseOtlpPayload(payload: OtlpPayload): ParseResult {
 
   const resourceAttrs = firstResourceSpan.resource?.attributes ?? []
   const agentId =
-    getStringAttr(resourceAttrs, 'traceforge.agent_id') ??
+    getStringAttr(resourceAttrs, 'tracion.agent_id') ??
     getStringAttr(resourceAttrs, 'service.name') ??
     'unknown'
-  const sessionId = getStringAttr(resourceAttrs, 'traceforge.session_id') ?? 'default'
+  const sessionId = getStringAttr(resourceAttrs, 'tracion.session_id') ?? 'default'
 
   const githubPrUrl     = getStringAttr(resourceAttrs, 'github.pr.url')
   const githubPrNumber  = getStringAttr(resourceAttrs, 'github.pr.number')
@@ -100,7 +100,7 @@ export function parseOtlpPayload(payload: OtlpPayload): ParseResult {
       const statusCode = span.status?.code
       if (statusCode === 2) hasError = true
 
-      const kind = (getStringAttr(spanAttrs, 'traceforge.kind') ?? 'custom') as SpanKind
+      const kind = (getStringAttr(spanAttrs, 'tracion.kind') ?? 'custom') as SpanKind
 
       const newSpan: NewSpan = {
         id: span.spanId,
@@ -125,16 +125,16 @@ export function parseOtlpPayload(payload: OtlpPayload): ParseResult {
         rootSpan = span
       }
 
-      ;(newSpan.attributes as Record<string, unknown>)['traceforge.agent_id'] = agentId
-      ;(newSpan.attributes as Record<string, unknown>)['traceforge.session_id'] = sessionId
+      ;(newSpan.attributes as Record<string, unknown>)['tracion.agent_id'] = agentId
+      ;(newSpan.attributes as Record<string, unknown>)['tracion.session_id'] = sessionId
 
       allSpans.push(newSpan)
     }
   }
 
   const rootAttrs = rootSpan?.attributes ?? []
-  const inputRaw = getStringAttr(rootAttrs, 'traceforge.input')
-  const outputRaw = getStringAttr(rootAttrs, 'traceforge.output')
+  const inputRaw = getStringAttr(rootAttrs, 'tracion.input')
+  const outputRaw = getStringAttr(rootAttrs, 'tracion.output')
   const firstSpanStart = firstResourceSpan.scopeSpans[0]?.spans[0]?.startTimeUnixNano
 
   const trace: NewTrace = {

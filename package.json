@@ -1,5 +1,5 @@
 {
-  "name": "traceforge",
+  "name": "tracion",
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {

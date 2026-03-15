@@ -1,6 +1,6 @@
 import { BasicTracerProvider, BatchSpanProcessor, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base'
 import { Resource } from '@opentelemetry/resources'
-import type { TraceforgeConfig } from './types'
+import type { TracionConfig } from './types'
 import { createExporter } from './exporter'
 
 type GithubPrContext = {
@@ -33,12 +33,12 @@ function detectGithubPrContext(): GithubPrContext | null {
   }
 }
 
-export function createTracerProvider(config: TraceforgeConfig): BasicTracerProvider {
+export function createTracerProvider(config: TracionConfig): BasicTracerProvider {
   const prContext = detectGithubPrContext()
 
   const resource = new Resource({
-    'traceforge.agent_id': config.agentId ?? 'unknown',
-    'traceforge.session_id': config.sessionId ?? 'default',
+    'tracion.agent_id': config.agentId ?? 'unknown',
+    'tracion.session_id': config.sessionId ?? 'default',
     'service.name': config.agentId ?? 'unknown',
     'process.runtime.version': process.version,
     'process.pid': process.pid,

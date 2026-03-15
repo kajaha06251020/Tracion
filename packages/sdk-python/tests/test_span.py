@@ -2,7 +2,7 @@ import json
 from unittest.mock import MagicMock
 from opentelemetry.trace import StatusCode, Status
 
-from traceforge._span import OtelTraceforgeSpan, NoopTraceforgeSpan
+from tracion._span import OtelTracionSpan, NoopTracionSpan
 
 
 def make_mock_span():
@@ -14,26 +14,26 @@ def make_mock_span():
     return span
 
 
-class TestOtelTraceforgeSpan:
+class TestOtelTracionSpan:
     def test_set_input_stores_json_string(self):
         otel = make_mock_span()
-        span = OtelTraceforgeSpan(otel)
+        span = OtelTracionSpan(otel)
         span.set_input({"prompt": "hello"})
         otel.set_attribute.assert_called_once_with(
-            "traceforge.input", json.dumps({"prompt": "hello"})
+            "tracion.input", json.dumps({"prompt": "hello"})
         )
 
     def test_set_output_stores_json_string(self):
         otel = make_mock_span()
-        span = OtelTraceforgeSpan(otel)
+        span = OtelTracionSpan(otel)
         span.set_output("result text")
         otel.set_attribute.assert_called_once_with(
-            "traceforge.output", json.dumps("result text")
+            "tracion.output", json.dumps("result text")
         )
 
     def test_end_success_sets_ok_status(self):
         otel = make_mock_span()
-        span = OtelTraceforgeSpan(otel)
+        span = OtelTracionSpan(otel)
         span.end(status="success")
 
         # Check set_status was called once
@@ -46,7 +46,7 @@ class TestOtelTraceforgeSpan:
 
     def test_end_error_sets_error_status_with_message(self):
         otel = make_mock_span()
-        span = OtelTraceforgeSpan(otel)
+        span = OtelTracionSpan(otel)
         span.end(status="error", error=ValueError("boom"))
 
         # Check set_status was called once
@@ -58,9 +58,9 @@ class TestOtelTraceforgeSpan:
         otel.end.assert_called_once()
 
 
-class TestNoopTraceforgeSpan:
+class TestNoopTracionSpan:
     def test_all_methods_do_not_raise(self):
-        span = NoopTraceforgeSpan()
+        span = NoopTracionSpan()
         span.set_input("x")
         span.set_output("x")
         span.set_attribute("k", "v")

@@ -1,11 +1,11 @@
-# Traceforge
+# Tracion
 
 **Open-source observability for AI agents.**
 Self-hosted. MCP-native. One command to start.
 
 <!--
   Replace this comment with a demo GIF:
-  ![Traceforge Demo](docs/demo.gif)
+  ![Tracion Demo](docs/demo.gif)
 -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -14,9 +14,9 @@ Self-hosted. MCP-native. One command to start.
 
 ---
 
-## What is Traceforge?
+## What is Tracion?
 
-Traceforge answers: **"What did my agent do, and why did it make that decision?"**
+Tracion answers: **"What did my agent do, and why did it make that decision?"**
 
 It captures every LLM call, tool invocation, and sub-agent spawn — then renders them as a
 causal graph you can click through. Built natively for Claude Code and the MCP ecosystem.
@@ -25,7 +25,7 @@ causal graph you can click through. Built natively for Claude Code and the MCP e
 [Your agent / SDK / cURL]
         │  OpenTelemetry
         ▼
-[Traceforge API]  ──→  [PostgreSQL + TimescaleDB]
+[Tracion API]  ──→  [PostgreSQL + TimescaleDB]
         │
         ▼
 [Web Dashboard]
@@ -42,8 +42,8 @@ causal graph you can click through. Built natively for Claude Code and the MCP e
 ### Option A — Full stack (recommended)
 
 ```bash
-git clone https://github.com/your-org/traceforge
-cd traceforge
+git clone https://github.com/your-org/tracion
+cd tracion
 cp .env.example .env          # fill in OAuth secrets (optional for local dev)
 docker compose up
 ```
@@ -64,7 +64,7 @@ bun run dev
 ## Claude Code users
 
 ```bash
-claude mcp add traceforge -- npx traceforge-mcp
+claude mcp add tracion -- npx tracion-mcp
 ```
 
 That's it. Your Claude Code agent traces appear in the dashboard automatically.
@@ -76,14 +76,14 @@ That's it. Your Claude Code agent traces appear in the dashboard automatically.
 ### TypeScript
 
 ```typescript
-import { traceforge } from '@traceforge/sdk'
+import { tracion } from '@tracion/sdk'
 
-traceforge.init({
+tracion.init({
   endpoint: 'http://localhost:3001',
   agentId: 'my-agent',
 })
 
-await traceforge.trace('generate_code', async (span) => {
+await tracion.trace('generate_code', async (span) => {
   span.setInput({ prompt: 'Write a sorting algorithm' })
   const result = await callClaude(prompt)
   span.setOutput({ code: result })
@@ -93,9 +93,9 @@ await traceforge.trace('generate_code', async (span) => {
 ### Python
 
 ```python
-from traceforge import TraceforgeSDK
+from tracion import TracionSDK
 
-sdk = TraceforgeSDK(endpoint="http://localhost:3001", agent_id="my-agent")
+sdk = TracionSDK(endpoint="http://localhost:3001", agent_id="my-agent")
 
 with sdk.trace("search_docs", kind="tool") as span:
     span.set_input({"query": "vector databases"})
@@ -131,14 +131,14 @@ curl -X POST http://localhost:3001/v1/traces \
 ## Architecture
 
 ```
-traceforge/
+tracion/
 ├── apps/
 │   ├── api/          — Hono + Bun backend (tRPC + OTel ingest + Better Auth)
 │   └── web/          — Next.js 15 App Router dashboard
 ├── packages/
-│   ├── sdk-typescript/   — @traceforge/sdk
-│   ├── sdk-python/       — traceforge (PyPI)
-│   └── mcp-server/       — traceforge-mcp (npx)
+│   ├── sdk-typescript/   — @tracion/sdk
+│   ├── sdk-python/       — tracion (PyPI)
+│   └── mcp-server/       — tracion-mcp (npx)
 └── docker-compose.yml    — TimescaleDB + Redis + API + Web
 ```
 
@@ -157,8 +157,8 @@ traceforge/
 Copy `.env.example` to `.env` and fill in your values:
 
 ```env
-TRACEFORGE_DATABASE_URL=postgresql://traceforge:traceforge@db:5432/traceforge
-TRACEFORGE_WEB_URL=http://localhost:3000
+TRACION_DATABASE_URL=postgresql://tracion:tracion@db:5432/tracion
+TRACION_WEB_URL=http://localhost:3000
 
 # OAuth (optional — skip for local dev)
 GITHUB_CLIENT_ID=
@@ -168,7 +168,7 @@ GOOGLE_CLIENT_SECRET=
 BETTER_AUTH_SECRET=your-random-secret-here
 ```
 
-> **Dev mode:** Leave `TRACEFORGE_API_KEY` and OAuth vars empty to skip authentication entirely.
+> **Dev mode:** Leave `TRACION_API_KEY` and OAuth vars empty to skip authentication entirely.
 
 ---
 
@@ -217,7 +217,7 @@ MIT — see [LICENSE](LICENSE).
 
 ## Why not Langfuse / Langsmith?
 
-| | Langfuse | Langsmith | **Traceforge** |
+| | Langfuse | Langsmith | **Tracion** |
 |--|---------|-----------|----------------|
 | Self-hosted | ✅ (complex) | ❌ SaaS only | ✅ One command |
 | MCP-native | ❌ | ❌ | ✅ |

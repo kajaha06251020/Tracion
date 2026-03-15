@@ -97,7 +97,7 @@ cat packages/sdk-python/pyproject.toml
 
 - [ ] **Step 2: Change package name**
 
-Change `name = "traceforge"` to `name = "tracion"`. Also update description/keywords if they reference TraceForge.
+Change `name = "tracion"` to `name = "tracion"`. Also update description/keywords if they reference Tracion.
 
 - [ ] **Step 3: Add build/twine dev dependencies**
 
@@ -123,7 +123,7 @@ Expected: `Successfully built tracion-*.tar.gz and tracion-*.whl`
 
 ```bash
 git add packages/sdk-python/pyproject.toml
-git commit -m "chore: rename Python package from traceforge to tracion"
+git commit -m "chore: rename Python package from tracion to tracion"
 ```
 
 ### Task 3: Initialize changesets
@@ -549,9 +549,9 @@ cat docs/CLAUDE.md
 
 - [ ] **Step 2: Fix the title on line 1**
 
-Change `# Traceforge — CLAUDE.md` to `# Tracion — CLAUDE.md`
+Change `# Tracion — CLAUDE.md` to `# Tracion — CLAUDE.md`
 
-Also change `## What Is Traceforge?` to `## What Is Tracion?` and update the body paragraph accordingly.
+Also change `## What Is Tracion?` to `## What Is Tracion?` and update the body paragraph accordingly.
 
 - [ ] **Step 3: Fix `bun audit` reference (~line 255)**
 

@@ -1,10 +1,10 @@
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
-import type { TraceforgeConfig } from './types'
+import type { TracionConfig } from './types'
 
-export function createExporter(config: TraceforgeConfig): OTLPTraceExporter {
+export function createExporter(config: TracionConfig): OTLPTraceExporter {
   const headers: Record<string, string> = {}
   if (config.apiKey) {
-    headers['X-Traceforge-Api-Key'] = config.apiKey
+    headers['X-Tracion-Api-Key'] = config.apiKey
   }
 
   return new OTLPTraceExporter({

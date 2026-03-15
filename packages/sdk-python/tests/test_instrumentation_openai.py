@@ -4,7 +4,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import StatusCode
 
-from traceforge.instrumentation._openai import patch_openai
+from tracion.instrumentation._openai import patch_openai
 
 
 def setup_provider():
@@ -46,7 +46,7 @@ class TestPatchOpenAI:
         assert span.attributes["llm.input_tokens"] == 150
         assert span.attributes["llm.output_tokens"] == 80
         assert span.attributes["llm.provider"] == "openai"
-        assert span.attributes["traceforge.kind"] == "llm"
+        assert span.attributes["tracion.kind"] == "llm"
         assert span.status.status_code == StatusCode.OK
 
     def test_records_error_span_on_exception(self):

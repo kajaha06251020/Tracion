@@ -9,18 +9,18 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk'
-import { traceforge } from '../../packages/sdk-typescript/src/index'
+import { tracion } from '../../packages/sdk-typescript/src/index'
 import { patchAnthropic } from '../../packages/sdk-typescript/src/instrumentation/anthropic'
 
 const client = new Anthropic()
 
-traceforge.init({
-  endpoint: process.env.TRACEFORGE_API_URL ?? 'http://localhost:3001',
+tracion.init({
+  endpoint: process.env.TRACION_API_URL ?? 'http://localhost:3001',
   agentId: 'anthropic-example',
 })
 
 // One line to auto-instrument — all subsequent API calls are traced
-patchAnthropic(client, traceforge['sdk']!)
+patchAnthropic(client, tracion['sdk']!)
 
 async function main() {
   const response = await client.messages.create({

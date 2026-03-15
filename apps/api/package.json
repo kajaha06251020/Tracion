@@ -1,5 +1,5 @@
 {
-  "name": "@traceforge/api",
+  "name": "@tracion/api",
   "private": true,
   "scripts": {
     "dev": "bun run --hot src/index.ts",

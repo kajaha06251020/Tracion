@@ -16,7 +16,7 @@ def patch_openai(tracer: Tracer, client: Any) -> None:
 
     def patched_create(*args: Any, **kwargs: Any) -> Any:
         span = tracer.start_span("openai.chat.completions.create")
-        span.set_attribute("traceforge.kind", "llm")
+        span.set_attribute("tracion.kind", "llm")
         span.set_attribute("llm.provider", "openai")
 
         model = kwargs.get("model") or (args[0] if args else None)

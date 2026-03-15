@@ -22,32 +22,32 @@ function buildApp() {
 describe('requireAuth', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    delete process.env.TRACEFORGE_API_KEY
+    delete process.env.TRACION_API_KEY
   })
 
   describe('API key auth (machine-to-machine)', () => {
     it('allows request when API key matches', async () => {
-      process.env.TRACEFORGE_API_KEY = 'secret-key'
+      process.env.TRACION_API_KEY = 'secret-key'
       const app = buildApp()
       const res = await app.request('/trpc/test', {
-        headers: { 'X-Traceforge-Api-Key': 'secret-key' },
+        headers: { 'X-Tracion-Api-Key': 'secret-key' },
       })
       expect(res.status).toBe(200)
     })
 
     it('rejects request when API key is wrong', async () => {
-      process.env.TRACEFORGE_API_KEY = 'secret-key'
+      process.env.TRACION_API_KEY = 'secret-key'
       const app = buildApp()
       const res = await app.request('/trpc/test', {
-        headers: { 'X-Traceforge-Api-Key': 'wrong-key' },
+        headers: { 'X-Tracion-Api-Key': 'wrong-key' },
       })
       expect(res.status).toBe(401)
     })
 
-    it('allows request with any key when TRACEFORGE_API_KEY is unset (dev mode)', async () => {
+    it('allows request with any key when TRACION_API_KEY is unset (dev mode)', async () => {
       const app = buildApp()
       const res = await app.request('/trpc/test', {
-        headers: { 'X-Traceforge-Api-Key': 'any-key' },
+        headers: { 'X-Tracion-Api-Key': 'any-key' },
       })
       expect(res.status).toBe(200)
     })
@@ -65,7 +65,7 @@ describe('requireAuth', () => {
     })
 
     it('rejects when no session and API key is required', async () => {
-      process.env.TRACEFORGE_API_KEY = 'secret-key'
+      process.env.TRACION_API_KEY = 'secret-key'
       vi.mocked(auth.api.getSession).mockResolvedValue(null)
       const app = buildApp()
       const res = await app.request('/trpc/test')

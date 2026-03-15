@@ -5,7 +5,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExportResult
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import StatusCode
 
-from traceforge._exporter import OtlpJsonExporter
+from tracion._exporter import OtlpJsonExporter
 
 
 def _make_spans():
@@ -38,7 +38,7 @@ class TestOtlpJsonExporter:
     def test_export_sends_correct_json_structure(self):
         exporter = OtlpJsonExporter(
             endpoint="http://localhost:3001",
-            headers={"X-Traceforge-Api-Key": "test-key"},
+            headers={"X-Tracion-Api-Key": "test-key"},
         )
         spans = _make_spans()
 
@@ -59,8 +59,8 @@ class TestOtlpJsonExporter:
 
         assert captured["url"] == "http://localhost:3001/v1/traces"
         # urllib.request.Request は capitalize() でヘッダーキーを正規化する
-        # "X-Traceforge-Api-Key" → "X-traceforge-api-key" → lower → "x-traceforge-api-key"
-        assert "x-traceforge-api-key" in {k.lower() for k in captured["headers"]}
+        # "X-Tracion-Api-Key" → "X-tracion-api-key" → lower → "x-tracion-api-key"
+        assert "x-tracion-api-key" in {k.lower() for k in captured["headers"]}
 
         body = captured["body"]
         assert "resourceSpans" in body

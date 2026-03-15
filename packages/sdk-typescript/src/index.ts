@@ -1,43 +1,43 @@
-import { TraceforgeSDK } from './sdk'
-import { NoopTraceforgeSpan } from './span'
-import type { TraceforgeSpan } from './span'
-import type { TraceforgeConfig, SpanOptions } from './types'
+import { TracionSDK } from './sdk'
+import { NoopTracionSpan } from './span'
+import type { TracionSpan } from './span'
+import type { TracionConfig, SpanOptions } from './types'
 
-export { TraceforgeSDK } from './sdk'
-export type { TraceforgeSpan } from './span'
-export type { TraceforgeConfig, SpanOptions, TraceStatus, SpanKind } from './types'
+export { TracionSDK } from './sdk'
+export type { TracionSpan } from './span'
+export type { TracionConfig, SpanOptions, TraceStatus, SpanKind } from './types'
 
 /** インスタンスを生成する（テスト・マルチエンドポイント向け） */
-export function createTraceforge(config: TraceforgeConfig): TraceforgeSDK {
-  return new TraceforgeSDK(config)
+export function createTracion(config: TracionConfig): TracionSDK {
+  return new TracionSDK(config)
 }
 
 /** グローバルシングルトン（アプリ全体で使い回す） */
-class GlobalTraceforge {
-  private sdk: TraceforgeSDK | null = null
+class GlobalTracion {
+  private sdk: TracionSDK | null = null
 
-  init(config: TraceforgeConfig): void {
-    this.sdk = new TraceforgeSDK(config)
+  init(config: TracionConfig): void {
+    this.sdk = new TracionSDK(config)
   }
 
   async trace<T>(
     name: string,
-    fn: (span: TraceforgeSpan) => Promise<T>,
+    fn: (span: TracionSpan) => Promise<T>,
     options?: SpanOptions
   ): Promise<T> {
     if (!this.sdk) {
       // init() 前でも動作する（enabled: false 相当）
-      return fn(new NoopTraceforgeSpan())
+      return fn(new NoopTracionSpan())
     }
     return this.sdk.trace(name, fn, options)
   }
 
-  startSpan(name: string, options?: SpanOptions): TraceforgeSpan {
+  startSpan(name: string, options?: SpanOptions): TracionSpan {
     if (!this.sdk) {
-      return new NoopTraceforgeSpan()
+      return new NoopTracionSpan()
     }
     return this.sdk.startSpan(name, options)
   }
 }
 
-export const traceforge = new GlobalTraceforge()
+export const tracion = new GlobalTracion()

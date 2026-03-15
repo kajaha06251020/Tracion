@@ -4,12 +4,12 @@ from typing import Generator
 from opentelemetry import context as context_api, trace as trace_api
 from opentelemetry.sdk.trace.export import SpanExporter
 
-from traceforge._span import OtelTraceforgeSpan, NoopTraceforgeSpan, TraceforgeSpan
-from traceforge._tracer import create_tracer_provider
-from traceforge._types import SpanKind
+from tracion._span import OtelTracionSpan, NoopTracionSpan, TracionSpan
+from tracion._tracer import create_tracer_provider
+from tracion._types import SpanKind
 
 
-class TraceforgeSDK:
+class TracionSDK:
     def __init__(
         self,
         endpoint: str,
@@ -36,25 +36,25 @@ class TraceforgeSDK:
             )
             # provider.register() は呼ばない — SDK は provider.get_tracer() を直接使用する
             # グローバル登録するとテスト間で OTel グローバル状態が汚染される
-            self._tracer = provider.get_tracer("traceforge", "0.1.0")
+            self._tracer = provider.get_tracer("tracion", "0.1.0")
 
     @contextmanager
     def trace(
         self,
         name: str,
         kind: SpanKind | None = None,
-    ) -> Generator[TraceforgeSpan, None, None]:
+    ) -> Generator[TracionSpan, None, None]:
         if not self._enabled or self._tracer is None:
-            yield NoopTraceforgeSpan()
+            yield NoopTracionSpan()
             return
 
         otel_span = self._tracer.start_span(name)
         if kind:
-            otel_span.set_attribute("traceforge.kind", kind)
+            otel_span.set_attribute("tracion.kind", kind)
 
         ctx = trace_api.set_span_in_context(otel_span)
         token = context_api.attach(ctx)
-        tf_span = OtelTraceforgeSpan(otel_span)
+        tf_span = OtelTracionSpan(otel_span)
 
         try:
             yield tf_span
@@ -65,11 +65,11 @@ class TraceforgeSDK:
         finally:
             context_api.detach(token)
 
-    def start_span(self, name: str, kind: SpanKind | None = None) -> TraceforgeSpan:
+    def start_span(self, name: str, kind: SpanKind | None = None) -> TracionSpan:
         if not self._enabled or self._tracer is None:
-            return NoopTraceforgeSpan()
+            return NoopTracionSpan()
 
         otel_span = self._tracer.start_span(name)
         if kind:
-            otel_span.set_attribute("traceforge.kind", kind)
-        return OtelTraceforgeSpan(otel_span)
+            otel_span.set_attribute("tracion.kind", kind)
+        return OtelTracionSpan(otel_span)

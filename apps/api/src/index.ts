@@ -10,7 +10,7 @@ const app = new Hono()
 
 app.use('*', honoLogger())
 app.use('*', cors({
-  origin: process.env.TRACEFORGE_WEB_URL ?? 'http://localhost:3000',
+  origin: process.env.TRACION_WEB_URL ?? 'http://localhost:3000',
   credentials: true,
 }))
 

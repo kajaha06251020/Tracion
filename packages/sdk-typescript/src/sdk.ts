@@ -1,20 +1,20 @@
 import { trace, context } from '@opentelemetry/api'
 import { createTracerProvider } from './tracer'
-import { OtelTraceforgeSpan, NoopTraceforgeSpan } from './span'
-import type { TraceforgeSpan } from './span'
-import type { TraceforgeConfig, SpanOptions } from './types'
+import { OtelTracionSpan, NoopTracionSpan } from './span'
+import type { TracionSpan } from './span'
+import type { TracionConfig, SpanOptions } from './types'
 
-export class TraceforgeSDK {
+export class TracionSDK {
   private readonly tracer: ReturnType<typeof trace.getTracer> | null
   private readonly enabled: boolean
 
-  constructor(config: TraceforgeConfig) {
+  constructor(config: TracionConfig) {
     this.enabled = config.enabled ?? true
 
     if (this.enabled) {
       const provider = createTracerProvider(config)
       provider.register()
-      this.tracer = provider.getTracer('@traceforge/sdk', '0.1.0')
+      this.tracer = provider.getTracer('@tracion/sdk', '0.1.0')
     } else {
       this.tracer = null
     }
@@ -22,18 +22,18 @@ export class TraceforgeSDK {
 
   async trace<T>(
     name: string,
-    fn: (span: TraceforgeSpan) => Promise<T>,
+    fn: (span: TracionSpan) => Promise<T>,
     options?: SpanOptions
   ): Promise<T> {
     if (!this.enabled || !this.tracer) {
-      return fn(new NoopTraceforgeSpan())
+      return fn(new NoopTracionSpan())
     }
 
     const otelSpan = this.tracer.startSpan(name)
     if (options?.kind) {
-      otelSpan.setAttribute('traceforge.kind', options.kind)
+      otelSpan.setAttribute('tracion.kind', options.kind)
     }
-    const tfSpan = new OtelTraceforgeSpan(otelSpan)
+    const tfSpan = new OtelTracionSpan(otelSpan)
 
     return context.with(trace.setSpan(context.active(), otelSpan), async () => {
       try {
@@ -47,15 +47,15 @@ export class TraceforgeSDK {
     })
   }
 
-  startSpan(name: string, options?: SpanOptions): TraceforgeSpan {
+  startSpan(name: string, options?: SpanOptions): TracionSpan {
     if (!this.enabled || !this.tracer) {
-      return new NoopTraceforgeSpan()
+      return new NoopTracionSpan()
     }
 
     const otelSpan = this.tracer.startSpan(name)
     if (options?.kind) {
-      otelSpan.setAttribute('traceforge.kind', options.kind)
+      otelSpan.setAttribute('tracion.kind', options.kind)
     }
-    return new OtelTraceforgeSpan(otelSpan)
+    return new OtelTracionSpan(otelSpan)
   }
 }

@@ -44,6 +44,6 @@ describe('patchOpenAI', () => {
     expect(span.attributes['llm.input_tokens']).toBe(150)
     expect(span.attributes['llm.output_tokens']).toBe(80)
     expect(span.attributes['llm.provider']).toBe('openai')
-    expect(span.attributes['traceforge.kind']).toBe('llm')
+    expect(span.attributes['tracion.kind']).toBe('llm')
   })
 })

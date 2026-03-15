@@ -56,7 +56,7 @@ describe('patchFetch', () => {
     expect(spans.length).toBeGreaterThan(0)
     const span = spans[0]!
     expect(span.attributes['llm.provider']).toBe('anthropic')
-    expect(span.attributes['traceforge.kind']).toBe('llm')
+    expect(span.attributes['tracion.kind']).toBe('llm')
   })
 
   it('Anthropic 以外の URL は通常の fetch として処理する', async () => {

@@ -2,16 +2,16 @@ services:
   db:
     image: timescale/timescaledb:latest-pg16
     environment:
-      POSTGRES_DB: traceforge
-      POSTGRES_USER: traceforge
-      POSTGRES_PASSWORD: traceforge
+      POSTGRES_DB: tracion
+      POSTGRES_USER: tracion
+      POSTGRES_PASSWORD: tracion
       POSTGRES_HOST_AUTH_METHOD: md5
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U traceforge"]
+      test: ["CMD-SHELL", "pg_isready -U tracion"]
       interval: 5s
       timeout: 5s
       retries: 10

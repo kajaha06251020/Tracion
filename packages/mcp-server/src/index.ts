@@ -12,14 +12,14 @@ import { handleSearchTraces } from './tools/search-traces'
 import { PollingEventSource } from './notifications/polling'
 
 // 環境変数から設定を読み込む
-const apiBaseUrl = process.env['TRACEFORGE_API_URL'] ?? 'http://localhost:3001'
-const apiKey = process.env['TRACEFORGE_API_KEY'] ?? undefined
-const pollingInterval = parseInt(process.env['TRACEFORGE_POLL_INTERVAL'] ?? '30000', 10)
+const apiBaseUrl = process.env['TRACION_API_URL'] ?? 'http://localhost:3001'
+const apiKey = process.env['TRACION_API_KEY'] ?? undefined
+const pollingInterval = parseInt(process.env['TRACION_POLL_INTERVAL'] ?? '30000', 10)
 
 const apiClient = createApiClient({ baseUrl: apiBaseUrl, apiKey })
 
 const server = new Server(
-  { name: 'traceforge', version: '0.1.0' },
+  { name: 'tracion', version: '0.1.0' },
   { capabilities: { tools: {}, logging: {} } }
 )
 
@@ -29,7 +29,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: 'list_traces',
-      description: 'Traceforge に記録されたトレースの一覧を取得します。',
+      description: 'Tracion に記録されたトレースの一覧を取得します。',
       inputSchema: {
         type: 'object' as const,
         properties: {
@@ -127,7 +127,7 @@ eventSource.start(async (event) => {
     method: 'notifications/message',
     params: {
       level: 'info',
-      data: `[Traceforge] 新しいトレース: "${event.name}" (agent: ${event.agentId}) — ID: ${event.traceId}`,
+      data: `[Tracion] 新しいトレース: "${event.name}" (agent: ${event.agentId}) — ID: ${event.traceId}`,
     },
   })
 })

@@ -1,10 +1,10 @@
-# Using Traceforge with Claude Code
+# Using Tracion with Claude Code
 
-Traceforge is the only observability platform built natively for Claude Code and the MCP ecosystem.
+Tracion is the only observability platform built natively for Claude Code and the MCP ecosystem.
 
 ## Setup (30 seconds)
 
-### 1. Start Traceforge
+### 1. Start Tracion
 
 ```bash
 docker compose up -d
@@ -13,13 +13,13 @@ docker compose up -d
 ### 2. Register the MCP server
 
 ```bash
-claude mcp add traceforge -- npx traceforge-mcp
+claude mcp add tracion -- npx tracion-mcp
 ```
 
 Or with a local dev build:
 
 ```bash
-claude mcp add traceforge-dev -- bun run packages/mcp-server/src/index.ts
+claude mcp add tracion-dev -- bun run packages/mcp-server/src/index.ts
 ```
 
 ### 3. Verify it works
@@ -48,7 +48,7 @@ Claude will call `list_traces` and show you what's been recorded.
 
 ```bash
 # In your shell or .env
-export TRACEFORGE_API_URL=http://localhost:3001
-export TRACEFORGE_API_KEY=           # leave empty for local dev
-export TRACEFORGE_POLL_INTERVAL=30000  # ms between new-trace notifications
+export TRACION_API_URL=http://localhost:3001
+export TRACION_API_KEY=           # leave empty for local dev
+export TRACION_POLL_INTERVAL=30000  # ms between new-trace notifications
 ```

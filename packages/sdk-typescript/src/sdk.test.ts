@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { InMemorySpanExporter } from '@opentelemetry/sdk-trace-base'
-import { TraceforgeSDK } from './sdk'
+import { TracionSDK } from './sdk'
 
 function createTestSdk(overrides: { enabled?: boolean } = {}) {
   const exporter = new InMemorySpanExporter()
-  const sdk = new TraceforgeSDK({
+  const sdk = new TracionSDK({
     endpoint: 'http://localhost:3001',
     agentId: 'test-agent',
     sessionId: 'test-session',
@@ -14,7 +14,7 @@ function createTestSdk(overrides: { enabled?: boolean } = {}) {
   return { sdk, exporter }
 }
 
-describe('TraceforgeSDK', () => {
+describe('TracionSDK', () => {
   it('trace() はコールバックの戻り値を返す', async () => {
     const { sdk } = createTestSdk()
     const result = await sdk.trace('test-op', async () => 42)
@@ -31,8 +31,8 @@ describe('TraceforgeSDK', () => {
     const spans = exporter.getFinishedSpans()
     expect(spans).toHaveLength(1)
     expect(spans[0]!.name).toBe('generate_code')
-    expect(spans[0]!.attributes['traceforge.input']).toBe('"hello"')
-    expect(spans[0]!.attributes['traceforge.output']).toBe('"world"')
+    expect(spans[0]!.attributes['tracion.input']).toBe('"hello"')
+    expect(spans[0]!.attributes['tracion.output']).toBe('"world"')
   })
 
   it('trace() 内で例外が throw されるとスパンが error になり再 throw される', async () => {
@@ -54,7 +54,7 @@ describe('TraceforgeSDK', () => {
     const spans = exporter.getFinishedSpans()
     expect(spans).toHaveLength(1)
     expect(spans[0]!.name).toBe('tool_call')
-    expect(spans[0]!.attributes['traceforge.kind']).toBe('tool')
+    expect(spans[0]!.attributes['tracion.kind']).toBe('tool')
   })
 
   it('enabled: false のとき trace() はコールバックを実行して値を返す', async () => {

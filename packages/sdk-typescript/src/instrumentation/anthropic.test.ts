@@ -46,6 +46,6 @@ describe('patchAnthropic', () => {
     expect(span.attributes['llm.input_tokens']).toBe(200)
     expect(span.attributes['llm.output_tokens']).toBe(100)
     expect(span.attributes['llm.provider']).toBe('anthropic')
-    expect(span.attributes['traceforge.kind']).toBe('llm')
+    expect(span.attributes['tracion.kind']).toBe('llm')
   })
 })

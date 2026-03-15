@@ -26,7 +26,7 @@ export function patchAnthropic(tracer: Tracer, client: AnthropicLike | undefined
       params: Parameters<AnthropicMessagesCreate>[0]
     ): Promise<Awaited<ReturnType<AnthropicMessagesCreate>>> {
       const span = tracer.startSpan('anthropic.messages.create')
-      span.setAttribute('traceforge.kind', 'llm')
+      span.setAttribute('tracion.kind', 'llm')
       span.setAttribute('llm.provider', 'anthropic')
       span.setAttribute('llm.model', params.model)
 

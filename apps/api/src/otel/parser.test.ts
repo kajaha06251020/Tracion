@@ -30,10 +30,10 @@ const minimalPayload: OtlpPayload = {
 }
 
 describe('parseOtlpPayload', () => {
-  it('extracts agentId from traceforge.agent_id attribute', () => {
+  it('extracts agentId from tracion.agent_id attribute', () => {
     const payload = structuredClone(minimalPayload)
     payload.resourceSpans[0]!.resource!.attributes!.push(
-      { key: 'traceforge.agent_id', value: { stringValue: 'claude-code' } }
+      { key: 'tracion.agent_id', value: { stringValue: 'claude-code' } }
     )
     const { trace } = parseOtlpPayload(payload)
     expect(trace.agentId).toBe('claude-code')
@@ -56,10 +56,10 @@ describe('parseOtlpPayload', () => {
     expect(trace.sessionId).toBe('default')
   })
 
-  it('extracts sessionId from traceforge.session_id attribute', () => {
+  it('extracts sessionId from tracion.session_id attribute', () => {
     const payload = structuredClone(minimalPayload)
     payload.resourceSpans[0]!.resource!.attributes!.push(
-      { key: 'traceforge.session_id', value: { stringValue: 'sess-abc' } }
+      { key: 'tracion.session_id', value: { stringValue: 'sess-abc' } }
     )
     const { trace } = parseOtlpPayload(payload)
     expect(trace.sessionId).toBe('sess-abc')
@@ -88,10 +88,10 @@ describe('parseOtlpPayload', () => {
     expect(spans[0]!.startTime.getFullYear()).toBe(2023)
   })
 
-  it('maps traceforge.kind span attribute to span.kind', () => {
+  it('maps tracion.kind span attribute to span.kind', () => {
     const payload = structuredClone(minimalPayload)
     payload.resourceSpans[0]!.scopeSpans[0]!.spans[0]!.attributes!.push(
-      { key: 'traceforge.kind', value: { stringValue: 'llm' } }
+      { key: 'tracion.kind', value: { stringValue: 'llm' } }
     )
     const { spans } = parseOtlpPayload(payload)
     expect(spans[0]!.kind).toBe('llm')

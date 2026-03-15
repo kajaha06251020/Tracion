@@ -72,7 +72,7 @@ export function patchFetch(tracer: Tracer): void {
     }
 
     const span = tracer.startSpan(`${endpoint.provider}.request`)
-    span.setAttribute('traceforge.kind', 'llm')
+    span.setAttribute('tracion.kind', 'llm')
     span.setAttribute('llm.provider', endpoint.provider)
 
     const model = extractModel(init?.body)

@@ -29,7 +29,7 @@ async function trpcQuery<T>(
 ): Promise<T> {
   const url = `${config.baseUrl}/trpc/${procedure}?input=${encodeURIComponent(JSON.stringify(input))}`
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (config.apiKey) headers['X-Traceforge-Api-Key'] = config.apiKey
+  if (config.apiKey) headers['X-Tracion-Api-Key'] = config.apiKey
 
   const res = await fetch(url, { headers })
   const json = await res.json() as {

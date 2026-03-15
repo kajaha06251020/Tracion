@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { SpanStatusCode } from '@opentelemetry/api'
 import type { Span as OtelSpan } from '@opentelemetry/api'
-import { OtelTraceforgeSpan, NoopTraceforgeSpan } from './span'
+import { OtelTracionSpan, NoopTracionSpan } from './span'
 
 function mockOtelSpan(): OtelSpan {
   return {
@@ -17,24 +17,24 @@ function mockOtelSpan(): OtelSpan {
   } as unknown as OtelSpan
 }
 
-describe('OtelTraceforgeSpan', () => {
-  it('setInput は traceforge.input 属性に JSON 文字列を設定する', () => {
+describe('OtelTracionSpan', () => {
+  it('setInput は tracion.input 属性に JSON 文字列を設定する', () => {
     const otel = mockOtelSpan()
-    const span = new OtelTraceforgeSpan(otel)
+    const span = new OtelTracionSpan(otel)
     span.setInput({ prompt: 'hello' })
-    expect(otel.setAttribute).toHaveBeenCalledWith('traceforge.input', '{"prompt":"hello"}')
+    expect(otel.setAttribute).toHaveBeenCalledWith('tracion.input', '{"prompt":"hello"}')
   })
 
-  it('setOutput は traceforge.output 属性に JSON 文字列を設定する', () => {
+  it('setOutput は tracion.output 属性に JSON 文字列を設定する', () => {
     const otel = mockOtelSpan()
-    const span = new OtelTraceforgeSpan(otel)
+    const span = new OtelTracionSpan(otel)
     span.setOutput('result text')
-    expect(otel.setAttribute).toHaveBeenCalledWith('traceforge.output', '"result text"')
+    expect(otel.setAttribute).toHaveBeenCalledWith('tracion.output', '"result text"')
   })
 
   it('end({ status: success }) は OTel status OK を設定する', () => {
     const otel = mockOtelSpan()
-    const span = new OtelTraceforgeSpan(otel)
+    const span = new OtelTracionSpan(otel)
     span.end({ status: 'success' })
     expect(otel.setStatus).toHaveBeenCalledWith({ code: SpanStatusCode.OK })
     expect(otel.end).toHaveBeenCalled()
@@ -42,16 +42,16 @@ describe('OtelTraceforgeSpan', () => {
 
   it('end({ status: error, error }) は OTel status ERROR とメッセージを設定する', () => {
     const otel = mockOtelSpan()
-    const span = new OtelTraceforgeSpan(otel)
+    const span = new OtelTracionSpan(otel)
     span.end({ status: 'error', error: new Error('boom') })
     expect(otel.setStatus).toHaveBeenCalledWith({ code: SpanStatusCode.ERROR, message: 'boom' })
     expect(otel.end).toHaveBeenCalled()
   })
 })
 
-describe('NoopTraceforgeSpan', () => {
+describe('NoopTracionSpan', () => {
   it('全メソッドがエラーを投げない', () => {
-    const span = new NoopTraceforgeSpan()
+    const span = new NoopTracionSpan()
     expect(() => span.setInput('x')).not.toThrow()
     expect(() => span.setOutput('x')).not.toThrow()
     expect(() => span.setAttribute('k', 'v')).not.toThrow()

@@ -5,7 +5,7 @@ from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor, SpanExporter
 
-from traceforge._exporter import OtlpJsonExporter
+from tracion._exporter import OtlpJsonExporter
 
 
 def create_tracer_provider(
@@ -23,8 +23,8 @@ def create_tracer_provider(
     バックエンドパーサーは resourceSpans[].resource.attributes から読み取る。
     """
     resource = Resource.create({
-        "traceforge.agent_id": agent_id or "unknown",
-        "traceforge.session_id": session_id or "default",
+        "tracion.agent_id": agent_id or "unknown",
+        "tracion.session_id": session_id or "default",
         "service.name": agent_id or "unknown",
         "process.pid": str(os.getpid()),
         "process.runtime.version": platform.python_version(),
@@ -40,7 +40,7 @@ def create_tracer_provider(
     else:
         headers: dict[str, str] = {}
         if api_key:
-            headers["X-Traceforge-Api-Key"] = api_key
+            headers["X-Tracion-Api-Key"] = api_key
         exporter = OtlpJsonExporter(endpoint=endpoint, headers=headers)
         provider.add_span_processor(
             BatchSpanProcessor(

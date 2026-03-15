@@ -1,5 +1,5 @@
 #!/bin/bash
-# Send a sample OTLP trace to Traceforge via cURL
+# Send a sample OTLP trace to Tracion via cURL
 # Usage: ./ingest.sh [API_URL]
 
 API_URL="${1:-http://localhost:3001}"
@@ -17,7 +17,7 @@ curl -s -X POST "${API_URL}/v1/traces" \
       \"resource\": {
         \"attributes\": [
           {\"key\": \"service.name\", \"value\": {\"stringValue\": \"curl-example\"}},
-          {\"key\": \"traceforge.agent_id\", \"value\": {\"stringValue\": \"curl-agent\"}}
+          {\"key\": \"tracion.agent_id\", \"value\": {\"stringValue\": \"curl-agent\"}}
         ]
       },
       \"scopeSpans\": [{
@@ -30,11 +30,11 @@ curl -s -X POST "${API_URL}/v1/traces" \
           \"endTimeUnixNano\": \"${END_NS}\",
           \"status\": {\"code\": 1},
           \"attributes\": [
-            {\"key\": \"traceforge.kind\", \"value\": {\"stringValue\": \"agent\"}},
-            {\"key\": \"traceforge.input\", \"value\": {\"stringValue\": \"\\\"hello from curl\\\"\"}},
-            {\"key\": \"traceforge.output\", \"value\": {\"stringValue\": \"\\\"success\\\"\"}},
-            {\"key\": \"traceforge.input_tokens\", \"value\": {\"intValue\": 10}},
-            {\"key\": \"traceforge.output_tokens\", \"value\": {\"intValue\": 5}}
+            {\"key\": \"tracion.kind\", \"value\": {\"stringValue\": \"agent\"}},
+            {\"key\": \"tracion.input\", \"value\": {\"stringValue\": \"\\\"hello from curl\\\"\"}},
+            {\"key\": \"tracion.output\", \"value\": {\"stringValue\": \"\\\"success\\\"\"}},
+            {\"key\": \"tracion.input_tokens\", \"value\": {\"intValue\": 10}},
+            {\"key\": \"tracion.output_tokens\", \"value\": {\"intValue\": 5}}
           ]
         }]
       }]

@@ -3,7 +3,7 @@ import { Pool } from 'pg'
 
 // Better Auth uses its own Pool connection (separate from Drizzle)
 const pool = new Pool({
-  connectionString: process.env.TRACEFORGE_DATABASE_URL,
+  connectionString: process.env.TRACION_DATABASE_URL,
 })
 
 export const auth = betterAuth({
@@ -22,7 +22,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
-  trustedOrigins: [process.env.TRACEFORGE_WEB_URL ?? 'http://localhost:3000'],
+  trustedOrigins: [process.env.TRACION_WEB_URL ?? 'http://localhost:3000'],
 })
 
 export type Auth = typeof auth

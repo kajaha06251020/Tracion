@@ -4,7 +4,7 @@ export async function postSlackTraceNotification(trace: Trace): Promise<void> {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL
   if (!webhookUrl) return
 
-  const webUrl = process.env.TRACEFORGE_WEB_URL ?? 'http://localhost:3000'
+  const webUrl = process.env.TRACION_WEB_URL ?? 'http://localhost:3000'
   const traceUrl = `${webUrl}/traces/${trace.id}`
 
   const status = trace.status === 'success' ? ':white_check_mark: Success' : ':x: Error'

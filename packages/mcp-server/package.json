@@ -1,9 +1,9 @@
 {
-  "name": "@traceforge/mcp-server",
+  "name": "@tracion/mcp-server",
   "version": "0.1.0",
   "private": true,
   "bin": {
-    "traceforge-mcp": "./src/index.ts"
+    "tracion-mcp": "./src/index.ts"
   },
   "scripts": {
     "dev": "bun run --hot src/index.ts",

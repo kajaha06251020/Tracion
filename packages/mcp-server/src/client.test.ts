@@ -57,7 +57,7 @@ describe('createApiClient', () => {
     expect(mockFetch).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        headers: expect.objectContaining({ 'X-Traceforge-Api-Key': 'secret' }),
+        headers: expect.objectContaining({ 'X-Tracion-Api-Key': 'secret' }),
       })
     )
   })

@@ -12,11 +12,11 @@ export type SpanEndOptions = {
   error?: unknown
 }
 
-export type TraceforgeConfig = {
-  endpoint: string            // 必須: Traceforge API の base URL（例: "http://localhost:3001"）
-  apiKey?: string             // オプション: X-Traceforge-Api-Key ヘッダー
-  agentId?: string            // → OTel Resource 属性 traceforge.agent_id と service.name に設定
-  sessionId?: string          // → OTel Resource 属性 traceforge.session_id に設定
+export type TracionConfig = {
+  endpoint: string            // 必須: Tracion API の base URL（例: "http://localhost:3001"）
+  apiKey?: string             // オプション: X-Tracion-Api-Key ヘッダー
+  agentId?: string            // → OTel Resource 属性 tracion.agent_id と service.name に設定
+  sessionId?: string          // → OTel Resource 属性 tracion.session_id に設定
   enabled?: boolean           // デフォルト true。false でノーオペレーション
   batchSize?: number          // デフォルト 512: BatchSpanProcessor の maxExportBatchSize
   exportIntervalMs?: number   // デフォルト 5000: BatchSpanProcessor の scheduledDelayMillis
