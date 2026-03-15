@@ -3,23 +3,55 @@ import { Resource } from '@opentelemetry/resources'
 import type { TraceforgeConfig } from './types'
 import { createExporter } from './exporter'
 
+type GithubPrContext = {
+  prNumber: string
+  prUrl: string
+  repository: string
+}
+
+function detectGithubPrContext(): GithubPrContext | null {
+  try {
+    const { execSync } = require('child_process') as typeof import('child_process')
+    const raw = execSync(
+      'gh pr view --json number,url,headRefName,baseRefName,headRepository',
+      { encoding: 'utf-8', timeout: 3000, stdio: ['pipe', 'pipe', 'ignore'] }
+    ) as string
+    const pr = JSON.parse(raw) as {
+      number: number
+      url: string
+      headRefName: string
+      baseRefName: string
+      headRepository: { nameWithOwner: string }
+    }
+    return {
+      prNumber: String(pr.number),
+      prUrl: pr.url,
+      repository: pr.headRepository.nameWithOwner,
+    }
+  } catch {
+    return null
+  }
+}
+
 export function createTracerProvider(config: TraceforgeConfig): BasicTracerProvider {
-  // agentId と sessionId は Resource 属性として設定（スパン属性ではない）
-  // バックエンドパーサーは resourceSpans[].resource.attributes から読み取る
+  const prContext = detectGithubPrContext()
+
   const resource = new Resource({
     'traceforge.agent_id': config.agentId ?? 'unknown',
     'traceforge.session_id': config.sessionId ?? 'default',
-    'service.name': config.agentId ?? 'unknown',  // OTel エコシステム互換
+    'service.name': config.agentId ?? 'unknown',
     'process.runtime.version': process.version,
     'process.pid': process.pid,
+    ...(prContext ? {
+      'github.pr.number': prContext.prNumber,
+      'github.pr.url': prContext.prUrl,
+      'github.repository': prContext.repository,
+    } : {}),
   })
 
   const exporter = config._exporter ?? createExporter(config)
-
   const provider = new BasicTracerProvider({ resource })
 
-  // テスト時は _exporter が注入されるため SimpleSpanProcessor を使用して同期的にフラッシュする
-  // 本番時は BatchSpanProcessor でバッファリングする
   if (config._exporter) {
     provider.addSpanProcessor(new SimpleSpanProcessor(exporter))
   } else {
