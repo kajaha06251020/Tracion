@@ -5,6 +5,7 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json ./
 COPY apps/web/package.json ./apps/web/
+COPY apps/api/package.json ./apps/api/
 COPY packages/ ./packages/
 # Install with legacy peer deps for workspace compatibility
 RUN npm install --legacy-peer-deps --ignore-scripts
