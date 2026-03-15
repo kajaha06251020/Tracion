@@ -1,10 +1,9 @@
-import { db } from '../db/index'
 import type { DB } from '../db/index'
+import type { auth } from '../auth/index'
+
+type AuthUser = typeof auth.$Infer.Session.user
 
 export type Context = {
   db: DB
-}
-
-export function createContext(): Context {
-  return { db }
+  user: AuthUser
 }
