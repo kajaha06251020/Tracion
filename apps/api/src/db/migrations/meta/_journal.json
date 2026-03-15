@@ -15,6 +15,13 @@
       "when": 1773452660486,
       "tag": "0005_share_token",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1773452660490,
+      "tag": "0006_github_notify",
+      "breakpoints": true
     }
   ]
 }
