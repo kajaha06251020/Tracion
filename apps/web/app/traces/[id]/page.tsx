@@ -17,8 +17,12 @@ export default function TraceDetailPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params)
   const [selectedSpanId, setSelectedSpanId] = useState<string | null>(null)
 
-  const { data: trace, isLoading: traceLoading } = trpc.traces.get.useQuery(id)
-  const { data: spans = [], isLoading: spansLoading } = trpc.spans.listByTrace.useQuery(id)
+  const { data: trace, isLoading: traceLoading } = trpc.traces.get.useQuery(id, {
+    refetchInterval: (query) => query.state.data?.status === 'running' ? 2000 : false,
+  })
+  const { data: spans = [], isLoading: spansLoading } = trpc.spans.listByTrace.useQuery(id, {
+    refetchInterval: trace?.status === 'running' ? 2000 : false,
+  })
 
   const selectedSpan = spans.find((s) => s.id === selectedSpanId)
 
@@ -40,7 +44,10 @@ export default function TraceDetailPage({ params }: { params: Promise<{ id: stri
           </Link>
           <div className="flex items-start justify-between">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{trace.name}</h1>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[trace.status]}`}>
+            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[trace.status]}`}>
+              {trace.status === 'running' && (
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              )}
               {trace.status}
             </span>
           </div>

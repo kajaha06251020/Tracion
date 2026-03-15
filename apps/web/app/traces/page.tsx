@@ -39,6 +39,14 @@ export default function TracesPage() {
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+        refetchInterval: (query) => {
+          // Auto-refresh every 5s if any running traces are visible
+          const pages = query.state.data?.pages ?? []
+          const hasRunning = pages.some((p) =>
+            p.items.some((t) => t.status === 'running')
+          )
+          return hasRunning ? 5000 : false
+        },
       }
     )
 
@@ -62,7 +70,15 @@ export default function TracesPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Traces</h1>
+        <div className="flex items-center gap-3 mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Traces</h1>
+          {traces.some((t) => t.status === 'running') && (
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              Live
+            </span>
+          )}
+        </div>
 
         {/* Filters */}
         <div className="flex flex-wrap gap-3 mb-6">
