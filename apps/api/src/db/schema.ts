@@ -29,6 +29,7 @@ export const traces = otelSchema.table('traces', {
   totalCostUsd: numeric('total_cost_usd', { precision: 10, scale: 6 }).default('0').notNull(),
   status: statusEnum('status').default('running').notNull(),
   metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}).notNull(),
+  shareToken: text('share_token').unique(),
 })
 
 export const spans = otelSchema.table('spans', {
