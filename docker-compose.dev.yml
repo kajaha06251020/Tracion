@@ -8,11 +8,19 @@ services:
       - /app/apps/api/node_modules
     environment:
       NODE_ENV: development
+      TRACEFORGE_DATABASE_URL: postgresql://traceforge:traceforge@db:5432/traceforge
+      TRACEFORGE_REDIS_URL: redis://redis:6379
 
   web:
-    command: npx next dev --port 3000
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: builder
+    command: npm run dev
     volumes:
       - ./apps/web:/app/apps/web
       - /app/apps/web/node_modules
+    working_dir: /app/apps/web
     environment:
       NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://api:3001
