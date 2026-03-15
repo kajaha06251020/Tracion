@@ -13,7 +13,6 @@ RUN npm install --legacy-peer-deps --ignore-scripts
 # Build stage
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules 2>/dev/null || true
 COPY . .
 
 WORKDIR /app/apps/web
