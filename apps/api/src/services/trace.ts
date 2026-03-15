@@ -1,4 +1,4 @@
-import { eq, and, desc, sql } from 'drizzle-orm'
+import { eq, and, desc, gte, sql } from 'drizzle-orm'
 import type { DB } from '../db/index'
 import { traces, spans } from '../db/schema'
 import type { NewTrace } from '../db/schema'
@@ -194,6 +194,65 @@ export async function getTraceStats(db: DB): Promise<Result<TraceStats, TraceErr
     stats.avgDurationMs = durationCount > 0 ? Math.round(weightedDuration / durationCount) : 0
 
     return ok(stats)
+  } catch (cause) {
+    return err({ code: 'DB_ERROR', cause })
+  }
+}
+
+// ── Analytics ─────────────────────────────────────────────────────────────────
+
+export type CostByAgent = {
+  agentId: string
+  traceCount: number
+  totalCostUsd: string
+  totalTokens: number
+}
+
+export type CostByDay = {
+  date: string        // ISO date string e.g. "2026-03-15"
+  totalCostUsd: string
+  traceCount: number
+}
+
+export type AnalyticsData = {
+  byAgent: CostByAgent[]
+  byDay: CostByDay[]
+}
+
+export async function getAnalytics(db: DB, days = 30): Promise<Result<AnalyticsData, TraceError>> {
+  try {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+
+    const [byAgentRows, byDayRows] = await Promise.all([
+      db
+        .select({
+          agentId: traces.agentId,
+          traceCount: sql<number>`count(*)::int`,
+          totalCostUsd: sql<string>`coalesce(sum(${traces.totalCostUsd}), 0)::text`,
+          totalTokens: sql<number>`coalesce(sum(${traces.totalTokens}), 0)::int`,
+        })
+        .from(traces)
+        .where(gte(traces.startTime, since))
+        .groupBy(traces.agentId)
+        .orderBy(sql`sum(${traces.totalCostUsd}) desc`)
+        .limit(20),
+
+      db
+        .select({
+          date: sql<string>`date_trunc('day', ${traces.startTime})::date::text`,
+          totalCostUsd: sql<string>`coalesce(sum(${traces.totalCostUsd}), 0)::text`,
+          traceCount: sql<number>`count(*)::int`,
+        })
+        .from(traces)
+        .where(gte(traces.startTime, since))
+        .groupBy(sql`date_trunc('day', ${traces.startTime})`)
+        .orderBy(sql`date_trunc('day', ${traces.startTime}) asc`),
+    ])
+
+    return ok({
+      byAgent: byAgentRows,
+      byDay: byDayRows,
+    })
   } catch (cause) {
     return err({ code: 'DB_ERROR', cause })
   }

@@ -6,6 +6,7 @@ import {
   deleteTrace,
   searchTraces,
   getTraceStats,
+  getAnalytics,
 } from '../../services/trace'
 import { TRPCError } from '@trpc/server'
 
@@ -63,6 +64,14 @@ export const tracesRouter = router({
   stats: publicProcedure
     .query(async ({ ctx }) => {
       const result = await getTraceStats(ctx.db)
+      if (!result.ok) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
+      return result.data
+    }),
+
+  analytics: publicProcedure
+    .input(z.object({ days: z.number().min(1).max(365).default(30) }))
+    .query(async ({ ctx, input }) => {
+      const result = await getAnalytics(ctx.db, input.days)
       if (!result.ok) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
       return result.data
     }),
