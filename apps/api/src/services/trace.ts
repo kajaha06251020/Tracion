@@ -257,3 +257,154 @@ export async function getAnalytics(db: DB, days = 30): Promise<Result<AnalyticsD
     return err({ code: 'DB_ERROR', cause })
   }
 }
+// ── Team Stats ────────────────────────────────────────────────────────────────
+
+export type AgentStats = {
+  agentId: string
+  traceCount: number
+  successCount: number
+  errorCount: number
+  totalCostUsd: string
+  totalTokens: number
+  avgDurationMs: number
+  lastActiveAt: string | null
+}
+
+export type TeamStatsData = {
+  agents: AgentStats[]
+  dailyCost: CostByDay[]
+}
+
+export async function getTeamStats(db: DB, days = 30): Promise<Result<TeamStatsData, TraceError>> {
+  try {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+
+    const [agentRows, dailyRows] = await Promise.all([
+      db
+        .select({
+          agentId: traces.agentId,
+          traceCount: sql<number>`count(*)::int`,
+          successCount: sql<number>`count(*) filter (where ${traces.status} = 'success')::int`,
+          errorCount: sql<number>`count(*) filter (where ${traces.status} = 'error')::int`,
+          totalCostUsd: sql<string>`coalesce(sum(${traces.totalCostUsd}), 0)::text`,
+          totalTokens: sql<number>`coalesce(sum(${traces.totalTokens}), 0)::int`,
+          avgDurationMs: sql<number>`coalesce(avg(extract(epoch from (${traces.endTime} - ${traces.startTime})) * 1000) filter (where ${traces.endTime} is not null), 0)::float`,
+          lastActiveAt: sql<string | null>`max(${traces.startTime})::text`,
+        })
+        .from(traces)
+        .where(gte(traces.startTime, since))
+        .groupBy(traces.agentId)
+        .orderBy(sql`sum(${traces.totalCostUsd}) desc`),
+
+      db
+        .select({
+          date: sql<string>`date_trunc('day', ${traces.startTime})::date::text`,
+          totalCostUsd: sql<string>`coalesce(sum(${traces.totalCostUsd}), 0)::text`,
+          traceCount: sql<number>`count(*)::int`,
+        })
+        .from(traces)
+        .where(gte(traces.startTime, since))
+        .groupBy(sql`date_trunc('day', ${traces.startTime})`)
+        .orderBy(sql`date_trunc('day', ${traces.startTime}) asc`),
+    ])
+
+    return ok({ agents: agentRows, dailyCost: dailyRows })
+  } catch (cause) {
+    return err({ code: 'DB_ERROR', cause })
+  }
+}
+
+// ── PR Costs ──────────────────────────────────────────────────────────────────
+
+export type PrCostEntry = {
+  prNumber: string
+  prUrl: string
+  repository: string
+  traceCount: number
+  totalCostUsd: string
+  totalTokens: number
+  agents: string[]
+  lastTraceAt: string | null
+}
+
+export async function getPrCosts(db: DB, days = 30): Promise<Result<PrCostEntry[], TraceError>> {
+  try {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+
+    // Filter traces that have GitHub PR metadata
+    const rows = await db
+      .select({
+        metadata: traces.metadata,
+        totalCostUsd: traces.totalCostUsd,
+        totalTokens: traces.totalTokens,
+        agentId: traces.agentId,
+        startTime: traces.startTime,
+      })
+      .from(traces)
+      .where(and(
+        gte(traces.startTime, since),
+        sql`${traces.metadata}->>'githubPrNumber' IS NOT NULL`,
+      ))
+      .orderBy(desc(traces.startTime))
+
+    // Group by PR number + repository in JS (jsonb grouping in SQL is cumbersome)
+    const prMap = new Map<string, {
+      prNumber: string
+      prUrl: string
+      repository: string
+      traceCount: number
+      totalCostUsd: number
+      totalTokens: number
+      agents: Set<string>
+      lastTraceAt: Date | null
+    }>()
+
+    for (const row of rows) {
+      const meta = row.metadata as Record<string, unknown>
+      const prNumber = meta.githubPrNumber as string
+      const prUrl = meta.githubPrUrl as string
+      const repository = (meta.githubRepository as string) ?? ''
+      const key = `${repository}#${prNumber}`
+
+      let entry = prMap.get(key)
+      if (!entry) {
+        entry = {
+          prNumber,
+          prUrl,
+          repository,
+          traceCount: 0,
+          totalCostUsd: 0,
+          totalTokens: 0,
+          agents: new Set(),
+          lastTraceAt: null,
+        }
+        prMap.set(key, entry)
+      }
+
+      entry.traceCount++
+      entry.totalCostUsd += parseFloat(row.totalCostUsd)
+      entry.totalTokens += row.totalTokens
+      entry.agents.add(row.agentId)
+      if (!entry.lastTraceAt || row.startTime > entry.lastTraceAt) {
+        entry.lastTraceAt = row.startTime
+      }
+    }
+
+    const result: PrCostEntry[] = [...prMap.values()]
+      .map((e) => ({
+        prNumber: e.prNumber,
+        prUrl: e.prUrl,
+        repository: e.repository,
+        traceCount: e.traceCount,
+        totalCostUsd: e.totalCostUsd.toFixed(6),
+        totalTokens: e.totalTokens,
+        agents: [...e.agents],
+        lastTraceAt: e.lastTraceAt?.toISOString() ?? null,
+      }))
+      .sort((a, b) => parseFloat(b.totalCostUsd) - parseFloat(a.totalCostUsd))
+
+    return ok(result)
+  } catch (cause) {
+    return err({ code: 'DB_ERROR', cause })
+  }
+}
