@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger as honoLogger } from 'hono/logger'
+import { publicRoute } from './routes/public'
 import { ingestRoute } from './routes/ingest'
 import { trpcRoute } from './routes/trpc'
 import { auth } from './auth/index'
@@ -16,6 +17,7 @@ app.use('*', cors({
 // Better Auth handles all /api/auth/* routes
 app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw))
 
+app.route('/', publicRoute)
 app.route('/', ingestRoute)
 app.route('/', trpcRoute)
 
