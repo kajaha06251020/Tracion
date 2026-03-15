@@ -10,7 +10,7 @@ services:
       NODE_ENV: development
 
   web:
-    command: bun run dev
+    command: npx next dev --port 3000
     volumes:
       - ./apps/web:/app/apps/web
       - /app/apps/web/node_modules
