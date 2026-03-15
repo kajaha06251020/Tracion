@@ -5,6 +5,7 @@ import { parseOtlpPayload } from '../otel/parser'
 import { createTrace } from '../services/trace'
 import { createSpans } from '../services/span'
 import { postGithubPrComment } from '../services/github-notify'
+import { postSlackTraceNotification } from '../services/slack-notify'
 import { db } from '../db/index'
 import { traces } from '../db/schema'
 import { apiErr } from '../types'
@@ -61,6 +62,27 @@ ingestRoute.post('/v1/traces', apiKeyMiddleware, async (c) => {
     if (claimed.length > 0) {
       postGithubPrComment(trace).catch((err) =>
         logger.warn({ err, traceId: trace.id }, 'github pr comment failed')
+      )
+    }
+  }
+
+  // Slack notification: atomic guard prevents duplicate notifications
+  if (
+    trace.status !== 'running' &&
+    process.env.SLACK_WEBHOOK_URL
+  ) {
+    const claimed = await db
+      .update(traces)
+      .set({ slackNotifiedAt: new Date() })
+      .where(and(
+        eq(traces.id, trace.id),
+        isNull(traces.slackNotifiedAt)
+      ))
+      .returning({ id: traces.id })
+
+    if (claimed.length > 0) {
+      postSlackTraceNotification(trace).catch((err) =>
+        logger.warn({ err, traceId: trace.id }, 'slack notification failed')
       )
     }
   }

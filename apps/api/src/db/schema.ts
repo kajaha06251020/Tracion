@@ -31,6 +31,7 @@ export const traces = otelSchema.table('traces', {
   metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}).notNull(),
   shareToken: text('share_token').unique(),
   githubCommentPostedAt: timestamp('github_comment_posted_at', { withTimezone: true }),
+  slackNotifiedAt: timestamp('slack_notified_at', { withTimezone: true }),
 })
 
 export const spans = otelSchema.table('spans', {
