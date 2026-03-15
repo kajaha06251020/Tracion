@@ -82,6 +82,10 @@ export function parseOtlpPayload(payload: OtlpPayload): ParseResult {
     'unknown'
   const sessionId = getStringAttr(resourceAttrs, 'traceforge.session_id') ?? 'default'
 
+  const githubPrUrl     = getStringAttr(resourceAttrs, 'github.pr.url')
+  const githubPrNumber  = getStringAttr(resourceAttrs, 'github.pr.number')
+  const githubRepo      = getStringAttr(resourceAttrs, 'github.repository')
+
   for (const scopeSpan of firstResourceSpan.scopeSpans) {
     for (const span of scopeSpan.spans) {
       const spanAttrs = span.attributes ?? []
@@ -145,7 +149,11 @@ export function parseOtlpPayload(payload: OtlpPayload): ParseResult {
     totalTokens,
     totalCostUsd: totalCostUsd.toFixed(6),
     status: hasError ? 'error' : 'success',
-    metadata: {},
+    metadata: {
+      ...(githubPrUrl    ? { githubPrUrl }                  : {}),
+      ...(githubPrNumber ? { githubPrNumber }               : {}),
+      ...(githubRepo     ? { githubRepository: githubRepo } : {}),
+    },
   }
 
   return { trace, spans: allSpans }
