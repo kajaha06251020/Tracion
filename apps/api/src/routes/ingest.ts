@@ -1,9 +1,12 @@
 import { Hono } from 'hono'
+import { and, eq, isNull } from 'drizzle-orm'
 import { apiKeyMiddleware } from '../middleware/auth'
 import { parseOtlpPayload } from '../otel/parser'
 import { createTrace } from '../services/trace'
 import { createSpans } from '../services/span'
+import { postGithubPrComment } from '../services/github-notify'
 import { db } from '../db/index'
+import { traces } from '../db/schema'
 import { apiErr } from '../types'
 import pino from 'pino'
 
@@ -38,7 +41,30 @@ ingestRoute.post('/v1/traces', apiKeyMiddleware, async (c) => {
     return c.json(apiErr('DB_ERROR', 'Failed to save spans'), 500)
   }
 
-  logger.info({ traceId: traceResult.data.id }, 'trace ingested')
-  // Flat response per spec: { success: true, traceId: "..." } (NOT wrapped in data)
-  return c.json({ success: true, traceId: traceResult.data.id }, 201)
+  const trace = traceResult.data
+
+  // GitHub PR auto-comment: atomic guard prevents duplicate comments
+  if (
+    trace.status !== 'running' &&
+    trace.metadata?.githubPrUrl &&
+    process.env.GITHUB_TOKEN
+  ) {
+    const claimed = await db
+      .update(traces)
+      .set({ githubCommentPostedAt: new Date() })
+      .where(and(
+        eq(traces.id, trace.id),
+        isNull(traces.githubCommentPostedAt)
+      ))
+      .returning({ id: traces.id })
+
+    if (claimed.length > 0) {
+      postGithubPrComment(trace).catch((err) =>
+        logger.warn({ err, traceId: trace.id }, 'github pr comment failed')
+      )
+    }
+  }
+
+  logger.info({ traceId: trace.id }, 'trace ingested')
+  return c.json({ success: true, traceId: trace.id }, 201)
 })
