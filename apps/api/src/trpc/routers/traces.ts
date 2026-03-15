@@ -5,6 +5,7 @@ import {
   listTraces,
   deleteTrace,
   searchTraces,
+  getTraceStats,
 } from '../../services/trace'
 import { TRPCError } from '@trpc/server'
 
@@ -56,6 +57,13 @@ export const tracesRouter = router({
     .query(async ({ ctx, input }) => {
       const result = await searchTraces(ctx.db, input.query, input.limit, input.since, input.until)
       if (!result.ok) throw traceErrorToTRPC(result.error.code)
+      return result.data
+    }),
+
+  stats: publicProcedure
+    .query(async ({ ctx }) => {
+      const result = await getTraceStats(ctx.db)
+      if (!result.ok) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
       return result.data
     }),
 })

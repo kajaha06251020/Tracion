@@ -4,6 +4,15 @@ import { traces, spans } from '../db/schema'
 import type { NewTrace } from '../db/schema'
 import { ok, err, type Result, type TraceError, type Trace, type Span } from '../types'
 
+export type TraceStats = {
+  total: number
+  running: number
+  success: number
+  error: number
+  totalCostUsd: string
+  avgDurationMs: number
+}
+
 type ListTracesInput = {
   cursor?: string | undefined
   limit?: number | undefined
@@ -141,6 +150,50 @@ export async function searchTraces(
       .orderBy(desc(traces.startTime))
       .limit(Math.min(limit, 100))
     return ok(rows as Trace[])
+  } catch (cause) {
+    return err({ code: 'DB_ERROR', cause })
+  }
+}
+
+export async function getTraceStats(db: DB): Promise<Result<TraceStats, TraceError>> {
+  try {
+    const rows = await db
+      .select({
+        status: traces.status,
+        count: sql<number>`count(*)::int`,
+        totalCost: sql<string>`coalesce(sum(${traces.totalCostUsd}), 0)::text`,
+        avgDurationMs: sql<number>`coalesce(avg(extract(epoch from (${traces.endTime} - ${traces.startTime})) * 1000) filter (where ${traces.endTime} is not null), 0)::float`,
+      })
+      .from(traces)
+      .groupBy(traces.status)
+
+    const stats: TraceStats = {
+      total: 0,
+      running: 0,
+      success: 0,
+      error: 0,
+      totalCostUsd: '0',
+      avgDurationMs: 0,
+    }
+
+    let totalCost = 0
+    let weightedDuration = 0
+    let durationCount = 0
+
+    for (const row of rows) {
+      stats.total += row.count
+      stats[row.status] = row.count
+      totalCost += parseFloat(row.totalCost)
+      if (row.status !== 'running') {
+        weightedDuration += row.avgDurationMs * row.count
+        durationCount += row.count
+      }
+    }
+
+    stats.totalCostUsd = totalCost.toFixed(6)
+    stats.avgDurationMs = durationCount > 0 ? Math.round(weightedDuration / durationCount) : 0
+
+    return ok(stats)
   } catch (cause) {
     return err({ code: 'DB_ERROR', cause })
   }
