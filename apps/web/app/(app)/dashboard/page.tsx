@@ -33,9 +33,10 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export default function DashboardPage() {
-  const { data: stats, isLoading: statsLoading } = trpc.traces.stats.useQuery(undefined, {
-    refetchInterval: stats?.running ? 5000 : false,
-  })
+  const statsQuery = trpc.traces.stats.useQuery()
+  const stats = statsQuery.data
+  const statsLoading = statsQuery.isLoading
+
   const { data: recent, isLoading: recentLoading } = trpc.traces.list.useQuery({ limit: 5 }, {
     refetchInterval: stats?.running ? 5000 : false,
   })
