@@ -8,7 +8,7 @@ services:
       - /app/apps/api/node_modules
     environment:
       NODE_ENV: development
-      TRACION_DATABASE_URL: postgresql://traceforge:traceforge@db:5432/traceforge
+      TRACION_DATABASE_URL: postgresql://tracion:tracion@db:5432/tracion
       TRACION_REDIS_URL: redis://redis:6379
 
   web:
