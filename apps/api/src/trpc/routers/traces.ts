@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { eq } from 'drizzle-orm'
 import { router, publicProcedure } from '../init'
 import {
   getTrace,
@@ -9,6 +10,7 @@ import {
   getAnalytics,
 } from '../../services/trace'
 import { TRPCError } from '@trpc/server'
+import { traces } from '../../db/schema'
 
 function traceErrorToTRPC(code: string): TRPCError {
   if (code === 'NOT_FOUND') return new TRPCError({ code: 'NOT_FOUND' })
@@ -74,5 +76,64 @@ export const tracesRouter = router({
       const result = await getAnalytics(ctx.db, input.days)
       if (!result.ok) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
       return result.data
+    }),
+
+  createShareLink: publicProcedure
+    .input(z.object({ traceId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      // Access check: verify trace exists
+      const [trace] = await ctx.db
+        .select({ id: traces.id })
+        .from(traces)
+        .where(eq(traces.id, input.traceId))
+        .limit(1)
+
+      if (!trace) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      // Generate cryptographically random 32-char base64url token (~143 bits)
+      const bytes = new Uint8Array(24)
+      crypto.getRandomValues(bytes)
+      const token = btoa(String.fromCharCode(...bytes))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '')
+
+      await ctx.db
+        .update(traces)
+        .set({ shareToken: token })
+        .where(eq(traces.id, input.traceId))
+
+      const webUrl = process.env.TRACION_WEB_URL ?? 'http://localhost:3000'
+      return { token, shareUrl: `${webUrl}/share/${token}` }
+    }),
+
+  revokeShareLink: publicProcedure
+    .input(z.object({ traceId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      // Access check: verify trace exists
+      const [trace] = await ctx.db
+        .select({ id: traces.id })
+        .from(traces)
+        .where(eq(traces.id, input.traceId))
+        .limit(1)
+
+      if (!trace) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      await ctx.db
+        .update(traces)
+        .set({ shareToken: null })
+        .where(eq(traces.id, input.traceId))
     }),
 })

@@ -48,6 +48,7 @@ export type Trace = {
   totalCostUsd: string  // numeric from DB comes as string
   status: TraceStatus
   metadata: Record<string, unknown>
+  shareToken: string | null
 }
 
 export type Span = {
